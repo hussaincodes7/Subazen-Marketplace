@@ -1,0 +1,105 @@
+import { userConstants } from "../actions/constants";
+
+const initState = {
+  address: [],
+  orders: [],
+  orderDetails: {},
+  error: null,
+  loading: false,
+  orderFetching: false,
+  placedOrderId: null,
+};
+
+export default (state = initState, action) => {
+  switch (action.type) {
+    case userConstants.GET_USER_ADDRESS_REQUEST:
+      state = {
+        ...state,
+        loading: true,
+      };
+      break;
+    case userConstants.GET_USER_ADDRESS_SUCCESS:
+      state = {
+        ...state,
+        address: action.payload.address,
+        loading: false,
+      };
+      break;
+    case userConstants.GET_USER_ADDRESS_FAILURE:
+      state = {
+        ...state,
+        loading: false,
+        error: action.payload.error,
+      };
+      break;
+    case userConstants.ADD_USER_ADDRESS_REQUEST:
+      state = {
+        ...state,
+        loading: true,
+      };
+      break;
+    case userConstants.ADD_USER_ADDRESS_SUCCESS:
+      state = {
+        ...state,
+        address: action.payload.address,
+        loading: false,
+      };
+      break;
+    case userConstants.ADD_USER_ADDRESS_FAILURE:
+      state = {
+        ...state,
+        loading: false,
+        error: action.payload.error,
+      };
+      break;
+    case userConstants.GET_USER_ORDER_REQUEST:
+      state = {
+        ...state,
+        orderFetching: true,
+      };
+      break;
+    case userConstants.GET_USER_ORDER_SUCCESS:
+      state = {
+        ...state,
+        orders: action.payload.orders,
+        orderFetching: false,
+      };
+      break;
+    case userConstants.GET_USER_ORDER_FAILURE:
+      state = {
+        ...state,
+        error: action.payload.error,
+        orderFetching: false,
+      };
+      break;
+    case userConstants.GET_USER_ORDER_DETAILS_REQUEST:
+      state = { ...state, orderFetching: true, orderDetails: {}, error: null };
+      break;
+    case userConstants.GET_USER_ORDER_DETAILS_SUCCESS:
+      state = {
+        ...state,
+        orderDetails: action.payload.order,
+        orderFetching: false,
+      };
+      break;
+    case userConstants.GET_USER_ORDER_DETAILS_FAILURE:
+      state = { ...state, orderFetching: false, error: action.payload?.error || "Could not load order details.", orderDetails: {} };
+      break;
+    case userConstants.ADD_USER_ORDER_SUCCESS:
+      state = {
+        ...state,
+        loading: false,
+        error: null,
+        placedOrderId: action.payload.order._id,
+      };
+      break;
+    case userConstants.ADD_USER_ORDER_REQUEST:
+      state = { ...state, loading: true, error: null };
+      break;
+    case userConstants.ADD_USER_ORDER_FAILURE:
+      state = { ...state, loading: false, error: action.payload.error };
+      break;
+  }
+
+  return state;
+};

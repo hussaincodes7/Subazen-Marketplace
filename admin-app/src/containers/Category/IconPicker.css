@@ -1,0 +1,9 @@
+.category-icon-picker { display: grid; gap: .55rem; }
+.category-icon-options { display: grid; gap: .4rem; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); max-height: 220px; overflow: auto; padding: .1rem; }
+.category-icon-options button { align-items: center; background: #fff; border: 1px solid #dce3ec; border-radius: .55rem; color: #35445a; display: flex; flex-direction: column; gap: .22rem; justify-content: center; min-height: 76px; padding: .5rem .3rem; }
+.category-icon-options button svg { color: #2874f0; font-size: 1.2rem; }
+.category-icon-options button span { font-size: .76rem; font-weight: 650; text-align: center; }
+.category-icon-options button small { color: #8190a3; font-size: .62rem; }
+.category-icon-options button:hover, .category-icon-options button.is-selected { background: #eef5ff; border-color: #2874f0; box-shadow: 0 0 0 2px rgba(40,116,240,.08); }
+.category-icon-no-results { color: #68778b; font-size: .82rem; grid-column: 1 / -1; margin: .4rem; }
+.category-icon-result-note { color: #68778b; font-size: .75rem; grid-column: 1 / -1; margin: .2rem .4rem; }

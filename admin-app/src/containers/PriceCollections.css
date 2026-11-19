@@ -1,0 +1,2 @@
+.price-collections-admin > .row > [class*="col"] { min-width: 0; }
+.price-collections-admin .table { min-width: 720px; }

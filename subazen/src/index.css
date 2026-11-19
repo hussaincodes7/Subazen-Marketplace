@@ -1,0 +1,85 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.App {
+  min-height: 100%;
+  min-width: 320px;
+  width: 100%;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  font-family: "Rubik", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --subazen-blue: #2874f0;
+  --subazen-blue-deep: #173b74;
+  --subazen-orange: #ff6b24;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  max-width: 100%;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+form,
+main,
+section,
+article,
+aside {
+  min-width: 0;
+}
+
+/* Keep validation/API messages readable inside every storefront form and viewport. */
+[role="alert"] {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.45;
+}
+
+/* Errors commonly sit inside grid or flex fields; allow them to shrink with the field. */
+form [role="alert"],
+.address-fields [role="alert"],
+.auth-form [role="alert"] {
+  width: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@media (max-width: 480px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

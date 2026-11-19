@@ -1,0 +1,7 @@
+.price-details-card { border: 1px solid #e6ebf1; border-radius: .7rem; box-shadow: 0 4px 18px rgba(20,35,55,.06) !important; max-width: none; overflow: hidden; }
+.price-details-card .cardHeader { border-bottom: 1px solid #edf0f4; padding: 1rem 1.25rem; }
+.price-details-card .cardHeader > div:first-child { color: #172434; font-size: 1.05rem !important; font-weight: 700 !important; }
+.price-details-body { box-sizing: border-box; padding: 1rem 1.25rem; }
+.price-details-row { align-items: flex-start; color: #4e5c6e; display: flex; font-size: .92rem; gap: 1rem; justify-content: space-between; line-height: 1.5; margin: .8rem 0; }
+.price-details-row > div:last-child { color: #172434; text-align: right; }
+.price-details-total { border-top: 1px dashed #d6dde6; color: #172434; font-size: 1rem; font-weight: 750; margin: 1.1rem 0 0; padding-top: 1rem; }

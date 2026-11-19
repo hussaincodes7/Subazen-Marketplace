@@ -1,0 +1,29 @@
+.caContainer{ min-width: 0; width: auto; }
+.caImgContainer{
+    aspect-ratio: 1 / 1;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.caImgContainer > img{ background: #f5f6f8; height: 100%; object-fit: contain; width: 100%; }
+.caProductName{
+    font-size: 12px;
+    padding: 10px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.caProductPrice{
+    font-size: 12px;
+    font-weight: 600;
+}
+.category-product-grid { box-sizing: border-box; display: grid; gap: .8rem; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); width: 100%; }
+.collection-brands { margin: .5rem 0 1rem; width: 100%; }
+.collection-brands h1 { font-size: clamp(1.25rem, 2vw, 1.8rem); margin: 0 0 1rem; }
+.collection-brand-grid { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+.collection-brand-card { align-items: center; background: #fff; border: 1px solid #e4e8ee; border-radius: .7rem; color: #182431; display: flex; flex-direction: column; gap: .5rem; min-width: 0; padding: .75rem; text-align: center; text-decoration: none; }
+.collection-brand-card img, .collection-brand-placeholder { aspect-ratio: 1; border-radius: .45rem; object-fit: contain; width: 100%; }
+.collection-brand-placeholder { align-items: center; background: #f2f5f9; display: flex; font-size: 2rem; justify-content: center; }
+.collection-brand-card strong { font-size: .9rem; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .collection-brand-grid { gap: .5rem; grid-template-columns: repeat(3, minmax(0, 1fr)); } .collection-brand-card { padding: .5rem; } }

@@ -1,0 +1,247 @@
+.admin-layout {
+    background: #f5f4f1;
+    min-height: calc(100vh - 56px);
+    padding: 0;
+}
+
+.admin-layout-row {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+    align-items: stretch;
+    background: #fff;
+    border-right: 1px solid #e5eaf1;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    align-self: start;
+    overflow-y: auto;
+    padding: 1.25rem 0.8rem;
+    position: sticky;
+    top: 56px;
+    z-index: 5;
+}
+
+.sidebar-section-label {
+    color: #8994a5;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin: 0.35rem 0.65rem 0.75rem;
+}
+
+.sidebar-brand {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 0.1rem 0 1.5rem;
+    padding: 0 0.3rem;
+}
+
+.sidebar-brand img {
+    height: auto;
+    max-height: 5rem;
+    max-width: 100%;
+    object-fit: contain;
+    width: 11rem;
+}
+
+.sidebar ul {
+    display: grid;
+    gap: 0.3rem;
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    align-items: center;
+    border-radius: 0.65rem;
+    color: #526074;
+    display: flex;
+    gap: 0.75rem;
+    margin: 0;
+    min-height: 2.65rem;
+    padding: 0.65rem 0.75rem;
+    text-decoration: none;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.sidebar ul li a svg {
+    color: #8a96a8;
+    flex: 0 0 1rem;
+}
+
+.sidebar ul li a:hover {
+    background: #f1f5fb;
+    color: #1b2738;
+}
+
+.sidebar ul li a.active {
+    background: #182431 !important;
+    color: #fff !important;
+    font-weight: 650;
+    position: relative;
+}
+
+.sidebar ul li a.active svg {
+    color: #1769e0;
+}
+
+.sidebar ul li a.active::before {
+    background: #1769e0;
+    border-radius: 0 3px 3px 0;
+    content: "";
+    height: 1.25rem;
+    left: -0.8rem;
+    position: absolute;
+    width: 3px;
+}
+
+.sidebar-account {
+    align-items: center;
+    border-top: 1px solid #e8edf3;
+    display: flex;
+    gap: 0.65rem;
+    margin-top: auto;
+    padding: 1rem 0.4rem 0.15rem;
+}
+
+.sidebar-account > span:last-child {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.sidebar-account strong {
+    color: #253247;
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-account small {
+    color: #8994a5;
+    font-size: 0.73rem;
+}
+
+.sidebar-account-avatar {
+    align-items: center;
+    background: #eaf2ff;
+    border-radius: 50%;
+    color: #1769e0;
+    display: inline-flex;
+    flex: 0 0 2.1rem;
+    font-weight: 700;
+    height: 2.1rem;
+    justify-content: center;
+}
+
+.admin-main {
+    min-height: calc(100vh - 56px);
+    min-width: 0;
+    padding: 1.5rem clamp(1rem, 2vw, 2rem) 2.5rem;
+    width: 100%;
+}
+
+.admin-main > .container,
+.admin-main > .container-fluid {
+    max-width: 100%;
+}
+
+.admin-main .btn {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    min-height: 2.55rem;
+}
+
+.admin-main .form-control,
+.admin-main .form-select {
+    min-height: 2.7rem;
+}
+
+.admin-main textarea.form-control {
+    min-height: 6rem;
+}
+
+.admin-layout,
+.admin-layout-row,
+.admin-main { max-width: 100%; min-width: 0; }
+.admin-main { overflow-x: clip; }
+.admin-main .card,
+.admin-main .row,
+.admin-main img { max-width: 100%; }
+.admin-main .table-responsive { max-width: 100%; overflow-x: auto; }
+.sidebar ul li a { min-width: 0; }
+
+@media (max-width: 991.98px) {
+    .admin-layout-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sidebar {
+        align-self: stretch;
+        height: auto;
+        overflow: visible;
+        padding: 0.6rem 0.75rem;
+        position: sticky;
+        top: 56px;
+        width: 100%;
+    }
+
+    .sidebar-section-label,
+    .sidebar-account {
+        display: none;
+    }
+
+    .sidebar-brand {
+        margin: 0 0 0.35rem;
+    }
+
+    .sidebar-brand img {
+        max-height: 2.6rem;
+        width: 9rem;
+    }
+
+    .sidebar ul {
+        display: flex;
+        gap: 0.35rem;
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
+
+    .sidebar ul li {
+        flex: 0 0 auto;
+    }
+
+    .sidebar ul li a {
+        min-height: 2.5rem;
+        padding: 0.55rem 0.7rem;
+        white-space: nowrap;
+    }
+
+    .admin-main {
+        min-height: calc(100vh - 110px);
+        padding: 0.8rem 0.6rem 1.5rem;
+        width: 100%;
+    }
+
+    .sidebar ul { overscroll-behavior-x: contain; }
+
+  .admin-main .btn {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 575.98px) {
+    .admin-main { padding: .7rem .55rem 1.25rem; }
+    .admin-main .card-body { padding: .85rem; }
+    .admin-main .form-control,
+    .admin-main .form-select { max-width: 100%; }
+    .admin-main .d-flex { min-width: 0; }
+}

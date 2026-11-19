@@ -1,0 +1,9 @@
+.brand-manager > .row > [class*="col"] { min-width: 0; }
+.brand-manager .card { min-width: 0; }
+.brand-manager .form-select[multiple] { min-height: 12rem; }
+.brand-logo-guidance { background: #f2f7ff; border-left: 3px solid #2874f0; color: #475569; font-size: .82rem; margin-bottom: .5rem; padding: .55rem .7rem; }
+.brand-logo-guidance strong { color: #174ea6; }
+.brand-logo-current { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: .4rem; display: block; height: 4rem; margin-bottom: .6rem; object-fit: contain; padding: .35rem; width: 8rem; }
+.brand-row, .brand-row-actions { align-items: center; display: flex; gap: .55rem; min-width: max-content; }
+.brand-row > img, .brand-row > span { align-items: center; background: #f3f6fa; border: 1px solid #e5eaf1; border-radius: .4rem; display: flex; height: 2.5rem; justify-content: center; object-fit: contain; padding: .2rem; width: 3.5rem; }
+@media (max-width: 575.98px) { .brand-manager .table { min-width: 700px; } .brand-manager .form-select[multiple] { min-height: 9rem; } }

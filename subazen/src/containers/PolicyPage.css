@@ -1,0 +1,10 @@
+.policy-page { color: #182431; margin: 0 auto; max-width: 980px; min-height: 55vh; padding: clamp(1.5rem, 4vw, 3rem) 1rem; }
+.policy-page h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); margin: 0 0 1.5rem; }
+.policy-page-content { color: #435267; font-size: 1rem; line-height: 1.8; overflow-wrap: anywhere; }
+.policy-page-content p { margin: 0 0 1rem; white-space: pre-wrap; }
+.policy-page-content h2 { color: #182431; font-size: 1.2rem; margin: 1.5rem 0 .65rem; }
+.policy-page-content ul { margin: 0 0 1rem; padding-left: 1.35rem; }
+.policy-page-content a { color: #b84b16; text-underline-offset: .15em; }
+.policy-page-empty { background: #f7f9fc; border: 1px solid #e4eaf2; border-radius: .75rem; padding: clamp(1.2rem, 4vw, 2rem); }
+.policy-page-empty p { color: #68778b; margin: 0; }
+.policy-related-links { border-top: 1px solid #e4eaf2; display: grid; gap: .75rem; margin-top: 2rem; padding-top: 1rem; }.policy-related-links > strong { font-size: .9rem; }.policy-related-links > div { display: flex; flex-wrap: wrap; gap: .55rem; }.policy-related-links a { background: #f6f8fb; border: 1px solid #e0e7f0; border-radius: 999px; color: #37516e; font-size: .84rem; padding: .45rem .75rem; text-decoration: none; }.policy-related-links a:hover { border-color: #ff6b24; color: #bd4a15; }

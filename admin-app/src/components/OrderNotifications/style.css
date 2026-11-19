@@ -1,0 +1,31 @@
+.admin-order-notifications { position: relative; }
+.admin-order-notifications-toggle { align-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: .7rem; color: #f5f3ef; display: inline-flex; height: 2.45rem; justify-content: center; position: relative; width: 2.45rem; }
+.admin-order-notifications-toggle::after { display: none; }
+.admin-order-notifications-toggle:hover, .admin-order-notifications-toggle:focus-visible { background: rgba(255,255,255,.16); color: #fff; }
+.admin-order-notifications-toggle > .badge { align-items: center; display: flex; font-size: .58rem; height: 1rem; justify-content: center; min-width: 1rem; padding: 0 .2rem; position: absolute; right: -.3rem; top: -.3rem; }
+.admin-order-notifications-menu { border: 1px solid #e4eaf1; border-radius: .85rem; bottom: auto !important; box-sizing: border-box; box-shadow: 0 16px 40px rgba(20,35,55,.2); left: auto !important; margin-top: 0; max-height: min(26rem, calc(100vh - 5rem)); max-width: calc(100vw - 1.5rem) !important; overflow: auto; padding: 0; position: fixed !important; right: .75rem !important; top: 3.65rem !important; transform: none !important; width: min(22rem, calc(100vw - 1.5rem)) !important; z-index: 1100; }
+.admin-order-notifications-heading { align-items: center; background: #fbfcfe; border-bottom: 1px solid #edf0f4; display: flex; justify-content: space-between; padding: .8rem .95rem; }
+.admin-order-notifications-heading > div { display: grid; gap: .12rem; }
+.admin-order-notifications-heading strong { color: #1b2c43; font-size: .87rem; }
+.admin-order-notifications-heading span { color: #8996a8; font-size: .69rem; }
+.admin-order-notifications-heading .btn { font-size: .68rem; padding: .2rem; text-decoration: none; }
+.admin-order-notifications-list { max-height: 22rem; overflow-y: auto; }
+.admin-order-notification { align-items: center; background: #fff; border: 0; border-bottom: 1px solid #f0f2f6; color: inherit; display: grid; gap: .65rem; grid-template-columns: 2rem minmax(0,1fr) .4rem; padding: .75rem .95rem; text-align: left; width: 100%; }
+.admin-order-notification:hover { background: #f7faff; }
+.admin-order-notification-icon { align-items: center; background: #eaf2ff; border-radius: .6rem; color: #2878f0; display: inline-flex; height: 2rem; justify-content: center; width: 2rem; }
+.admin-order-notification-copy { display: grid; min-width: 0; }
+.admin-order-notification-copy strong { color: #293a51; font-size: .74rem; }
+.admin-order-notification-copy span { color: #66758a; font-size: .7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-order-notification-copy small { color: #98a4b4; font-size: .63rem; margin-top: .15rem; }
+.admin-order-notification > i { background: #2878f0; border-radius: 50%; height: .4rem; width: .4rem; }
+.admin-order-notification.is-read > i { visibility: hidden; }
+.admin-order-notifications-empty { color: #8794a7; font-size: .75rem; line-height: 1.45; padding: 1.3rem .95rem; text-align: center; }
+.admin-order-notifications-refresh { border-top: 1px solid #edf0f4; color: #2878f0; font-size: .72rem; font-weight: 650; padding: .65rem; text-align: center; }
+@media (max-width: 991.98px) {
+  .admin-order-notifications-menu { max-height: calc(100vh - 4.5rem); right: .5rem !important; width: min(22rem, calc(100vw - 1rem)) !important; }
+  .admin-order-notifications-list { max-height: calc(100vh - 9rem); }
+}
+
+@media (max-width: 575.98px) {
+  .admin-order-notifications-menu { left: .5rem !important; max-width: none !important; right: .5rem !important; width: auto !important; }
+}

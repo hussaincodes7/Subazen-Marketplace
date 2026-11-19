@@ -1,0 +1,17 @@
+**/node_modules/
+**/build/
+**/build-verify/
+**/coverage/
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/.aws/
+**/.ssh/
+**/*credentials*.json
+**/.npmrc
+*.log
+.DS_Store

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /search
+Disallow: /cart
+Disallow: /checkout
+Disallow: /account
+Sitemap: https://www.subazen.com/sitemap.xml

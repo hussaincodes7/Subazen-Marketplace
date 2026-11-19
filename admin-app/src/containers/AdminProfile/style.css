@@ -1,0 +1,158 @@
+.admin-profile-page {
+  --profile-ink: #172033;
+  --profile-muted: #697586;
+  --profile-line: #e5eaf1;
+  color: var(--profile-ink);
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+.admin-profile-heading {
+  margin-bottom: 1.5rem;
+}
+
+.admin-profile-eyebrow {
+  color: #1769e0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.admin-profile-heading h1 {
+  font-size: clamp(1.65rem, 2.5vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin: 0.3rem 0;
+}
+
+.admin-profile-heading p,
+.admin-approval-heading p {
+  color: var(--profile-muted);
+  margin: 0;
+}
+
+.admin-profile-card {
+  border: 1px solid var(--profile-line);
+  border-radius: 1rem;
+  box-shadow: 0 12px 34px rgba(23, 32, 51, 0.065);
+  height: 100%;
+}
+
+.admin-profile-card > .card-body {
+  padding: 1.4rem;
+}
+
+.admin-profile-summary {
+  align-items: center;
+  border-bottom: 1px solid var(--profile-line);
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.admin-profile-summary img,
+.admin-profile-avatar-fallback {
+  align-items: center;
+  background: #eaf2ff;
+  border-radius: 50%;
+  color: #1769e0;
+  display: inline-flex;
+  flex: 0 0 4.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  height: 4.5rem;
+  justify-content: center;
+  object-fit: cover;
+  width: 4.5rem;
+}
+
+.admin-profile-summary h2,
+.admin-approval-heading h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.admin-profile-summary p {
+  color: var(--profile-muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+.admin-profile-card hr {
+  border-color: var(--profile-line);
+  margin: 1.25rem 0;
+}
+
+.admin-profile-card h3 {
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.admin-approval-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.admin-approval-heading p {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  margin-top: 0.3rem;
+}
+
+.admin-approval-list {
+  max-height: 28rem;
+  overflow-y: auto;
+}
+
+.admin-approval-item {
+  align-items: center;
+  border-top: 1px solid var(--profile-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.9rem 0;
+}
+
+.admin-approval-person {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-approval-person span {
+  color: var(--profile-muted);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-approval-empty {
+  background: #f8fafd;
+  border-radius: 0.75rem;
+  color: var(--profile-muted);
+  padding: 1.2rem;
+  text-align: center;
+}
+
+@media (max-width: 575.98px) {
+  .admin-profile-page {
+    padding: 1rem 0.75rem 2rem;
+  }
+
+  .admin-profile-card > .card-body {
+    padding: 1rem;
+  }
+
+  .admin-approval-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-approval-item > .btn {
+    width: 100%;
+  }
+}
