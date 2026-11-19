@@ -36,6 +36,40 @@
     margin-bottom: 1.25rem;
 }
 
+.products-header-actions,
+.product-csv-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.product-csv-help,
+.product-csv-examples {
+    background: #f5f8fc;
+    border: 1px solid #e3eaf3;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.product-csv-help h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.45rem; }
+.product-csv-help p { color: #536174; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.55rem; }
+.product-csv-examples { display: grid; gap: 0.5rem; overflow-wrap: anywhere; }
+.product-csv-examples code { color: #24508c; white-space: normal; }
+.product-csv-errors { color: inherit; font: inherit; margin: 0; max-height: 13rem; overflow: auto; white-space: pre-wrap; }
+
+@media (max-width: 600px) {
+    .products-header-actions { width: 100%; }
+    .products-header-actions .btn { flex: 1 1 100%; }
+    .product-csv-actions { align-items: stretch; flex-direction: column; }
+    .product-csv-actions .btn { width: 100%; }
+    .product-csv-modal .modal-body,
+    .product-csv-modal .modal-footer { padding: 0.9rem; }
+    .product-csv-help,
+    .product-csv-examples { padding: 0.8rem; }
+}
+
 .products-page-header h1,
 .orders-page-header h1 {
     color: #182431;

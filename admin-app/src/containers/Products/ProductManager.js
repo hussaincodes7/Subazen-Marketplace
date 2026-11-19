@@ -6,6 +6,7 @@ import { addProduct, deleteProductById, updateProduct } from "../../actions/prod
 import { getAllCategory } from "../../actions/category.action";
 import axios from "../../helpers/axios";
 import { generatePublicUrl } from "../../urlConfig";
+import { PRODUCT_CSV_COLUMNS, parseCsv, parseJsonCell, stringifyCsv } from "./productCsv";
 import "./style.css";
 
 const blankSize = () => ({ size: "", quantity: "" });
@@ -45,6 +46,13 @@ export default function ProductManager() {
   const [previewPrint, setPreviewPrint] = useState("");
   const [previewCustomOptions, setPreviewCustomOptions] = useState({});
   const [descriptionLink, setDescriptionLink] = useState("");
+  const [csvShow, setCsvShow] = useState(false);
+  const [csvText, setCsvText] = useState("");
+  const [csvFiles, setCsvFiles] = useState([]);
+  const [csvBusy, setCsvBusy] = useState(false);
+  const [csvStatus, setCsvStatus] = useState("");
+  const [csvError, setCsvError] = useState("");
+  const csvInputRef = useRef(null);
   const descriptionRef = useRef(null);
 
   const reload = async () => {
@@ -61,6 +69,76 @@ export default function ProductManager() {
   const selectedCategory = categories.find((item) => item.value === form.category);
   const isPrinting = printingCategory(selectedCategory);
   const visibleRows = rows.filter((item) => `${item.name} ${item.brand} ${item.category?.name || ""}`.toLowerCase().includes(search.toLowerCase()));
+  const downloadCsv = (filename, content) => {
+    const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a"); link.href = url; link.download = filename; link.click(); URL.revokeObjectURL(url);
+  };
+  const exportProducts = () => {
+    const exported = rows.map((product) => {
+      const category = categories.find((item) => item.value === String(product.category?._id || product.category));
+      const mainImages = (product.productPictures || []).map((picture) => picture.img);
+      const colors = (product.colors || []).map((color) => ({ colorName: color.colorName, colorCode: color.colorCode, price: color.price, quantity: color.quantity, sizes: color.sizes || [], use_product_images: Boolean(color.useProductPictures), image_files: color.useProductPictures ? [] : (color.productPictures || []).map((picture) => picture.img) }));
+      return [product.name, category?.label || product.category?.name || "", product.brand || "", product.price, product.quantity, product.description, mainImages.join("|"), product.defaultColorName || "", JSON.stringify(product.sizes || []), JSON.stringify(colors), JSON.stringify(product.specifications || []), JSON.stringify(product.customPrintOptions || []), JSON.stringify(product.customProductOptions || []), product.customDesignGuidelines || "", product.requiresCustomerDesign, product.allowDesignInstructions, product.discountEnabled, product.offer, product.dealEnabled, product.dealLabel || "", product.reviewsEnabled, product.warranty || ""];
+    });
+    downloadCsv("subazen-products.csv", stringifyCsv(PRODUCT_CSV_COLUMNS, exported));
+  };
+  const importProducts = async () => {
+    setCsvError(""); setCsvStatus("");
+    let products;
+    try { products = parseCsv(csvText); }
+    catch (e) { setCsvError(e.message); return; }
+    if (products.length > 100) { setCsvError("Import up to 100 products at a time. Split larger CSV files into smaller batches."); return; }
+    const filesByName = new Map(csvFiles.map((file) => [file.name.toLowerCase(), file]));
+    const bool = (value, fallback = false) => value === "" ? fallback : /^(true|1|yes)$/i.test(value.trim());
+    const number = (value, fallback = 0) => value === "" ? fallback : Number(value);
+    const failures = [];
+    let created = 0;
+    setCsvBusy(true);
+    try {
+      for (let index = 0; index < products.length; index += 1) {
+        const row = products[index];
+        try {
+          const categoryName = row.category_path.trim().toLowerCase();
+          const matches = categories.filter((item) => item.label.toLowerCase() === categoryName || item.slug?.toLowerCase() === categoryName);
+          if (matches.length !== 1) throw new Error(`Row ${row.__row}: category_path must exactly match one category path shown in the category list.`);
+          const brand = row.brand.trim() ? brands.find((item) => item.isActive !== false && item.name.trim().toLowerCase() === row.brand.trim().toLowerCase()) : null;
+          if (row.brand.trim() && !brand) throw new Error(`Row ${row.__row}: brand “${row.brand}” was not found or is inactive.`);
+          const mainNames = row.image_files.split("|").map((name) => name.trim()).filter(Boolean);
+          const mainUploads = mainNames.map((name) => filesByName.get(name.toLowerCase()));
+          if (mainUploads.some((file) => !file)) throw new Error(`Row ${row.__row}: choose every file listed in image_files.`);
+          if (!mainUploads.length) throw new Error(`Row ${row.__row}: add at least one WebP image filename in image_files.`);
+          const sizes = parseJsonCell(row, "sizes_json");
+          const colors = parseJsonCell(row, "colors_json").map((color, colorIndex) => {
+            const colorFiles = (color.image_files || []).map((name) => filesByName.get(String(name).toLowerCase()));
+            if (colorFiles.some((file) => !file)) throw new Error(`Row ${row.__row}: choose every color image file listed in colors_json.`);
+            return { colorName: String(color.colorName || ""), colorCode: String(color.colorCode || "#000000"), price: color.price === "" || color.price == null ? undefined : Number(color.price), quantity: color.quantity === "" || color.quantity == null ? undefined : Number(color.quantity), sizes: color.sizes || [], useProductPictures: color.use_product_images === true, productPictures: [], imageOrder: colorFiles.map((_, imageIndex) => ({ type: "new", index: imageIndex })), __files: colorFiles, __index: colorIndex };
+          });
+          const allImages = [...mainUploads, ...colors.flatMap((color) => color.__files)];
+          if (allImages.length > 30) throw new Error(`Row ${row.__row}: at most 30 images can be uploaded per product.`);
+          if (allImages.some((file) => file.type !== "image/webp" || file.size > 400 * 1024)) throw new Error(`Row ${row.__row}: images must be WebP files no larger than 400 KB each.`);
+          const data = new FormData();
+          const values = { name: row.name.trim(), category: matches[0].value, brandId: brand?._id || "", price: number(row.price, NaN), quantity: number(row.quantity, NaN), description: row.description, defaultColorName: row.default_color_name || "", customDesignGuidelines: row.custom_design_guidelines || "", warranty: row.warranty || "", offer: number(row.offer), dealLabel: row.deal_label || "", featuredImageIndex: "0" };
+          if (!values.name || !values.description.trim() || !Number.isFinite(values.price) || values.price < 0 || (!colors.length && (!Number.isInteger(values.quantity) || values.quantity < 0))) throw new Error(`Row ${row.__row}: name, description, price, and valid inventory are required.`);
+          Object.entries(values).forEach(([key, value]) => data.append(key, String(value)));
+          [["discountEnabled", bool(row.discount_enabled)], ["dealEnabled", bool(row.deal_enabled)], ["reviewsEnabled", bool(row.reviews_enabled, true)], ["requiresCustomerDesign", bool(row.requires_customer_design)], ["allowDesignInstructions", bool(row.allow_design_instructions)]].forEach(([key, value]) => data.append(key, String(value)));
+          data.append("sizes", JSON.stringify(sizes));
+          data.append("specifications", JSON.stringify(parseJsonCell(row, "specifications_json")));
+          data.append("customPrintOptions", JSON.stringify(parseJsonCell(row, "custom_print_options_json")));
+          data.append("customProductOptions", JSON.stringify(parseJsonCell(row, "custom_product_options_json")));
+          const cleanColors = colors.map(({ __files, __index, ...color }) => { __files.forEach((file) => data.append(`colorPicture_${__index}`, file)); return color; });
+          data.append("colors", JSON.stringify(cleanColors));
+          mainUploads.forEach((file) => data.append("productPicture", file));
+          const result = await dispatch(addProduct(data));
+          if (!result || result.error) throw new Error(`Row ${row.__row}: ${result?.error || "API rejected this product."}`);
+          created += 1;
+          setCsvStatus(`Importing ${index + 1} of ${products.length} · ${created} added · ${failures.length} failed`);
+        } catch (e) { failures.push(e.message || `Row ${row.__row}: import failed.`); }
+      }
+      await reload();
+      setCsvStatus(`${created} product${created === 1 ? "" : "s"} added${failures.length ? `; ${failures.length} failed` : " successfully"}.`);
+      if (failures.length) setCsvError(failures.slice(0, 20).join("\n"));
+    } finally { setCsvBusy(false); }
+  };
   const setField = (key, value) => { setError(""); setFieldErrors((current) => ({ ...current, [key]: false })); setForm((current) => ({ ...current, [key]: value })); };
   const openCreate = () => { setEditing(null); setForm(blankForm()); setMainFiles([]); setMainExisting([]); setMainOrder([]); setPreviewPrint(""); setPreviewCustomOptions({}); setFieldErrors({}); setError(""); setNotice(""); setShow(true); };
   const openEdit = (product) => {
@@ -235,9 +313,18 @@ export default function ProductManager() {
   }, 0);
 
   return <Layout sidebar><div className="products-page">
-    <header className="products-page-header"><div><span className="products-eyebrow">CATALOG MANAGEMENT</span><h1>Products</h1><p>Manage listings, images, colors, sizes, and custom-print options.</p></div><Button variant="primary" onClick={openCreate}>Add product</Button></header>
+    <header className="products-page-header"><div><span className="products-eyebrow">CATALOG MANAGEMENT</span><h1>Products</h1><p>Manage listings, images, colors, sizes, and custom-print options.</p></div><div className="products-header-actions"><Button variant="outline-primary" onClick={() => { setCsvShow(true); setCsvError(""); setCsvStatus(""); }}>Import CSV</Button><Button variant="outline-primary" onClick={exportProducts}>Export CSV</Button><Button variant="primary" onClick={openCreate}>Add product</Button></div></header>
     {notice && !show && <Alert role="status" aria-live="polite" variant="success" dismissible onClose={() => setNotice("")}>{notice}</Alert>}{error && !show && <Alert variant="danger" dismissible onClose={() => setError("")}>{error}</Alert>}
     <div className="products-list-card"><div className="d-flex flex-wrap gap-2 justify-content-between align-items-center p-3"><strong>{visibleRows.length} products</strong><Form.Control aria-label="Search products" placeholder="Search products, brands, categories" value={search} onChange={(e) => setSearch(e.target.value)} style={{ maxWidth: 360 }} /></div><div className="table-responsive"><Table hover className="products-table mb-0 align-middle"><thead><tr><th>Image</th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody>{visibleRows.map((item) => { const image = item.productPictures?.[item.featuredImageIndex || 0]?.img || item.productPictures?.[0]?.img; return <tr key={item._id}><td>{image ? <img className="products-table-thumb" src={generatePublicUrl(image)} alt="" /> : "—"}</td><td><strong>{item.name}</strong><small className="d-block text-muted">{item.brand || "No brand"}</small></td><td>{item.category?.name || "—"}</td><td>Rs. {Number(item.price || 0).toLocaleString("en-PK")}</td><td>{item.quantity ?? 0}</td><td><div className="d-flex gap-2"><Button size="sm" variant="outline-primary" onClick={() => openEdit(item)}>Edit</Button><Button size="sm" variant="outline-danger" disabled={busy} onClick={() => removeProduct(item)}>Delete</Button></div></td></tr>; })}{!visibleRows.length && <tr><td colSpan="6" className="products-empty-cell">No products found.</td></tr>}</tbody></Table></div></div>
+
+    <Modal show={csvShow} onHide={() => !csvBusy && setCsvShow(false)} size="lg" centered scrollable dialogClassName="product-modal product-csv-modal"><Modal.Header closeButton><div><Modal.Title>Product CSV import and export</Modal.Title><div className="small text-muted">Use CSV for product details and attach image files for upload.</div></div></Modal.Header><Modal.Body>
+      <div className="product-csv-help"><h3>Import format</h3><p>Download a blank template, fill one product per row, then upload it. Category must match its full category path. Use JSON cells for sizes, colors, specifications, print prices, and custom product options.</p><p><strong>Images:</strong> put local WebP filenames in <code>image_files</code>, separated by <code>|</code>, then select those same files below. For color-specific pictures, add <code>"image_files":["red-front.webp"]</code> inside that color in <code>colors_json</code>. Use <code>"use_product_images":true</code> to reuse the main images for a color. Images are sent through the existing Multer product upload API.</p><p className="mb-0">Images must be WebP, at most 400 KB each, and at most 30 per product. Imports run sequentially (up to 100 rows) so a failed row does not undo earlier successful rows.</p></div>
+      <div className="product-csv-examples"><strong>Example JSON cells</strong><code>{'sizes_json: [{"size":"M","quantity":5}]'}</code><code>{'colors_json: [{"colorName":"Black","colorCode":"#000000","quantity":5,"use_product_images":true}]'}</code><code>{'custom_product_options_json: [{"name":"Paper","options":[{"value":"300 GSM","price":250}]}]'}</code></div>
+      <div className="product-csv-actions"><Button variant="outline-secondary" onClick={() => downloadCsv("subazen-products-template.csv", stringifyCsv(PRODUCT_CSV_COLUMNS, []))}>Download CSV template</Button><Button variant="outline-secondary" onClick={exportProducts}>Export current products</Button></div>
+      <Form.Group className="mt-3"><Form.Label>CSV file</Form.Label><Form.Control ref={csvInputRef} type="file" accept=".csv,text/csv" onChange={async (event) => { const file = event.target.files?.[0]; if (file) { setCsvError(""); setCsvStatus(""); setCsvText(await file.text()); } }} /><Form.Text>CSV files are processed on this admin page and sent using your authenticated session.</Form.Text></Form.Group>
+      <Form.Group className="mt-3"><Form.Label>Product image files referenced by the CSV</Form.Label><Form.Control type="file" accept="image/webp,.webp" multiple onChange={(event) => setCsvFiles(Array.from(event.target.files || []))} /><Form.Text>Select local images whose filenames appear in image_files and colors_json. Existing server filenames in an export are labels only; select the original image files when importing into another server.</Form.Text></Form.Group>
+      {csvStatus && <Alert variant="info" className="mt-3 mb-0" aria-live="polite">{csvStatus}</Alert>}{csvError && <Alert variant="danger" className="mt-3 mb-0"><pre className="product-csv-errors">{csvError}</pre></Alert>}
+    </Modal.Body><Modal.Footer><Button variant="outline-secondary" disabled={csvBusy} onClick={() => setCsvShow(false)}>Close</Button><Button variant="primary" disabled={csvBusy || !csvText} onClick={importProducts}>{csvBusy ? <><Spinner size="sm" className="me-2" />Importing…</> : "Import products"}</Button></Modal.Footer></Modal>
 
     <Modal show={show} onHide={close} size="xl" centered scrollable dialogClassName="product-modal"><Form onSubmit={submit} noValidate><Modal.Header closeButton><div><Modal.Title>{editing ? "Edit product" : "Add product"}</Modal.Title><div className="small text-muted">Fields marked optional can be left blank.</div></div></Modal.Header><Modal.Body>
       {notice && <Alert role="status" aria-live="polite" variant="success" dismissible onClose={() => setNotice("")}>{notice}</Alert>}{error && <Alert variant="danger" dismissible onClose={() => setError("")}>{error}</Alert>}
