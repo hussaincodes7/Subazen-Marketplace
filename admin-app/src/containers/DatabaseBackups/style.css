@@ -1,0 +1,33 @@
+.database-backups-page { max-width: 1320px; }
+.database-backups-heading { align-items: center; background: linear-gradient(120deg, #f4f7fc, #fff); border: 1px solid #e1e8f1; border-radius: 14px; display: flex; justify-content: space-between; margin-bottom: 1rem; padding: clamp(1rem, 3vw, 1.6rem); }
+.database-backups-heading h1 { color: #172434; font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 750; margin: .25rem 0; }
+.database-backups-heading p { color: #67768a; margin: 0; max-width: 52rem; }
+.database-backups-heading > svg { color: #2874f0; flex: 0 0 auto; font-size: 2rem; margin-left: 1rem; }
+.database-backups-eyebrow { color: #2874f0; font-size: .7rem; font-weight: 750; letter-spacing: .12em; }
+.database-backups-note { align-items: flex-start; display: flex; gap: .75rem; }
+.database-backups-note > svg { flex: 0 0 auto; margin-top: .2rem; }
+.database-backups-note div { display: grid; gap: .2rem; }
+.database-backups-note span { font-size: .86rem; }
+.database-backups-card { border: 1px solid #e0e6ee; box-shadow: 0 3px 12px rgba(28, 47, 70, .045); min-width: 0; }
+.database-backups-card > .card-header { align-items: center; background: #f8fafc; display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; }
+.database-backups-card > .card-header h2 { color: #172434; font-size: 1.05rem; font-weight: 700; margin: 0 0 .25rem; }
+.database-backups-card > .card-header p { color: #67768a; font-size: .84rem; margin: 0; }
+.database-backups-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.database-backups-table { font-size: .86rem; min-width: 660px; }
+.database-backups-table thead th { background: #f8fafd; color: #697586; font-size: .72rem; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.database-backups-table td, .database-backups-table th { padding: .8rem .75rem; }
+.database-backups-table td strong { overflow-wrap: anywhere; }
+.database-backups-empty { color: #697586 !important; padding: 2rem 1rem !important; text-align: center; }
+.database-backups-card > .card-footer { align-items: center; background: #fff; display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; }
+.database-backups-card > .card-footer span { color: #67768a; font-size: .83rem; }
+.database-restore-modal .modal-content { border: 0; border-radius: 1rem; box-shadow: 0 1.25rem 4rem rgba(15, 23, 42, .2); }
+.database-restore-modal .modal-title { color: #182431; font-size: 1.15rem; font-weight: 700; }
+@media (max-width: 640px) {
+  .database-backups-heading > svg { display: none; }
+  .database-backups-card > .card-header { align-items: stretch; }
+  .database-backups-actions { width: 100%; }
+  .database-backups-actions .btn { flex: 1; }
+  .database-backups-card > .card-footer { align-items: stretch; flex-direction: column; }
+  .database-backups-card > .card-footer .btn { width: 100%; }
+  .database-restore-modal .modal-dialog { margin: .5rem; max-width: calc(100vw - 1rem); }
+}

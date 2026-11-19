@@ -3,7 +3,7 @@ import Header from "../header";
 import { Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FaBoxes, FaClipboardList, FaHome, FaLayerGroup, FaRegFileAlt, FaTruck, FaColumns, FaAddressBook, FaStar, FaTags, FaEnvelopeOpenText, FaChartLine } from "react-icons/fa";
+import { FaBoxes, FaClipboardList, FaHome, FaLayerGroup, FaRegFileAlt, FaTruck, FaColumns, FaAddressBook, FaStar, FaTags, FaEnvelopeOpenText, FaChartLine, FaDatabase } from "react-icons/fa";
 import { generatePublicUrl } from "../../urlConfig";
 import "./style.css";
 
@@ -44,6 +44,7 @@ const Layout = (props) => {
                 {user?.role === "admin" && <li><NavLink to={`/homepage`}><FaColumns aria-hidden="true" /><span>Homepage</span></NavLink></li>}
                 {user?.role === "admin" && <li><NavLink to={`/footer`}><FaAddressBook aria-hidden="true" /><span>Footer</span></NavLink></li>}
                 {user?.role === "admin" && <li><NavLink to={`/tracking`}><FaChartLine aria-hidden="true" /><span>Google tracking</span></NavLink></li>}
+                {user?.role === "admin" && <li><NavLink to={`/database-backups`}><FaDatabase aria-hidden="true" /><span>Database backups</span></NavLink></li>}
                 {user?.role === "admin" && <li><NavLink to={`/reviews`}><FaStar aria-hidden="true" /><span>Reviews</span></NavLink></li>}
                 {user?.role === "admin" && <li><NavLink to={`/contact-messages`}><FaEnvelopeOpenText aria-hidden="true" /><span>Contact messages</span></NavLink></li>}
               </ul>

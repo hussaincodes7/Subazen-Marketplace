@@ -27,6 +27,7 @@ const reviewAdminRoutes = require('./routes/admin/review');
 const footerRoutes = require('./routes/footer');
 const contactRoutes = require('./routes/contact');
 const trackingAdminRoutes = require('./routes/admin/tracking');
+const databaseBackupRoutes = require('./routes/admin/databaseBackup');
 const trackingRoutes = require('./routes/tracking');
 const positiveInt = (value, fallback) => {
   const parsed = Number.parseInt(value, 10);
@@ -121,6 +122,7 @@ app.use('/api/admin', homepageAdminRoutes);
 app.use('/api/admin', footerAdminRoutes);
 app.use('/api/admin', reviewAdminRoutes);
 app.use('/api/admin', trackingAdminRoutes);
+app.use('/api/admin', databaseBackupRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', brandRoutes);
 app.use('/api', priceCollectionRoutes);

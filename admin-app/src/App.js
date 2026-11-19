@@ -22,6 +22,7 @@ import Reviews from "./containers/Reviews";
 import ContactInbox from "./containers/ContactInbox";
 import BrandManager from "./containers/BrandManager";
 import TrackingSettings from "./containers/TrackingSettings";
+import DatabaseBackups from "./containers/DatabaseBackups";
 function App() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
@@ -80,6 +81,7 @@ function App() {
         <PrivateRoute path="/homepage" allowedRoles={["admin"]} component={Homepage} />
         <PrivateRoute path="/footer" allowedRoles={["admin"]} component={FooterSettings} />
         <PrivateRoute path="/tracking" allowedRoles={["admin"]} component={TrackingSettings} />
+        <PrivateRoute path="/database-backups" allowedRoles={["admin"]} component={DatabaseBackups} />
         <PrivateRoute path="/reviews" allowedRoles={["admin"]} component={Reviews} />
         <PrivateRoute path="/contact-messages" allowedRoles={["admin"]} component={ContactInbox} />
         <Route path="/signin" component={Signin} />
