@@ -95,9 +95,10 @@ const OrderDetailsPage = (props) => {
                 {(item.productOptionSelections || []).map((option) => <div className="delItemName" key={`${option.name}-${option.value}`}>{option.name}: {option.value}{Number(option.price) > 0 ? ` (+Rs. ${Number(option.price).toLocaleString("en-PK")})` : ""}</div>)}
                 <div className="order-detail-quantity">Quantity: {item.purchasedQty || 1}</div>
                 <Price value={Number(item.payablePrice || 0) * Number(item.purchasedQty || 1)} />
-                {item.designImage && <div className="order-detail-customer-design">
+                {(item.designImage || item.designImageFront || item.designImageBack) && <div className="order-detail-customer-design">
                   <strong>Your uploaded print design</strong>
-                  <a href={generatePublicUrl(item.designImage)} target="_blank" rel="noreferrer"><img src={generatePublicUrl(item.designImage)} alt={`Uploaded design for ${item.productId?.name || "this product"}`} /><span>Open image</span></a>
+                  {[["Front", item.designImageFront], ["Back", item.designImageBack]].filter(([, url]) => url).map(([side, url]) => <a key={side} href={generatePublicUrl(url)} target="_blank" rel="noreferrer">{/\.pdf(?:\?|$)/i.test(url) ? <span className="order-detail-pdf">PDF</span> : <img src={generatePublicUrl(url)} alt={`${side} artwork for ${item.productId?.name || "this product"}`} />}<span>Open {side} {/\.pdf(?:\?|$)/i.test(url) ? "PDF" : "image"}</span></a>)}
+                  {!item.designImageFront && !item.designImageBack && item.designImage && <a href={generatePublicUrl(item.designImage)} target="_blank" rel="noreferrer">{/\.pdf(?:\?|$)/i.test(item.designImage) ? <span className="order-detail-pdf">PDF</span> : <img src={generatePublicUrl(item.designImage)} alt={`Uploaded design for ${item.productId?.name || "this product"}`} />}<span>Open {/\.pdf(?:\?|$)/i.test(item.designImage) ? "PDF" : "image"}</span></a>}
                   {item.designInstructions && <p><b>Print instructions:</b> {item.designInstructions}</p>}
                 </div>}
               </div>

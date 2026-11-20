@@ -6,7 +6,7 @@ import { generatePublicUrl } from "../../urlConfig";
 import "./style.css";
 
 const types = ["banner", "products", "recommended", "spotlight", "categories", "text"];
-const newSection = (type) => ({ type, title: "", description: "", image: "", mobileImage: "", href: "", productIds: [], spotlightCards: [], cardWidth: 220, categoryIds: [], layout: "grid", enabled: true, desktopFile: null, mobileFile: null });
+const newSection = (type) => ({ type, title: "", description: "", image: "", mobileImage: "", href: "", productIds: [], spotlightCards: [], cardWidth: 200, categoryIds: [], layout: "grid", enabled: true, desktopFile: null, mobileFile: null });
 const selectedValues = (event) => Array.from(event.target.selectedOptions, (option) => option.value);
 
 export default function Homepage() {
@@ -28,7 +28,7 @@ export default function Homepage() {
       .then(([layoutResponse, dataResponse]) => {
         if (!current) return;
         const layout = layoutResponse.data?.layout;
-        setSections((layout?.sections || []).map((section) => ({ ...section, cardWidth: section.type === "spotlight" && Number(section.cardWidth || 250) === 250 ? 220 : section.cardWidth, desktopFile: null, mobileFile: null })));
+        setSections((layout?.sections || []).map((section) => ({ ...section, cardWidth: section.type === "spotlight" && [220, 250].includes(Number(section.cardWidth || 250)) ? 200 : section.cardWidth, desktopFile: null, mobileFile: null })));
         setPublished(layout?.published !== false);
         setProducts(dataResponse.data?.products || []);
         const flatten = (items) => items.flatMap((item) => [item, ...flatten(item.children || [])]);
@@ -91,7 +91,7 @@ export default function Homepage() {
     </section>;
     if (section.type === "spotlight") return <section className="homepage-preview-section" key={`preview-${index}`}>
       <h3>{section.title || "In The Spotlight"}</h3>
-      <div className="homepage-spotlight-preview" style={{ "--spotlight-card-width": `${Math.max(140, Math.min(360, Number(section.cardWidth) || 220))}px` }}>
+      <div className="homepage-spotlight-preview" style={{ "--spotlight-card-width": `${Math.max(140, Math.min(360, Number(section.cardWidth) || 200))}px` }}>
         {(section.spotlightCards || []).map((card, cardIndex) => { const product = products.find((item) => String(item._id) === String(card.productId?._id || card.productId)); const image = card.file ? URL.createObjectURL(card.file) : (card.image ? generatePublicUrl(card.image) : ""); return <article className="homepage-spotlight-card" key={`preview-card-${cardIndex}`}>{image ? <img src={image} alt="" /> : <div className="homepage-spotlight-empty">Card image preview</div>}<strong>{product?.name || "Choose a product"}</strong></article>; })}
       </div>
     </section>;
@@ -135,7 +135,7 @@ export default function Homepage() {
               {section.type === "products" && <Form.Group><Form.Label>Product display</Form.Label><Form.Select value={section.layout || "grid"} onChange={(event) => changeSection(index, "layout", event.target.value)}><option value="grid">Grid</option><option value="slider">Horizontal slider</option></Form.Select></Form.Group>}
             </>}
             {section.type === "spotlight" && <>
-              <Form.Group><Form.Label>Card width on desktop (px)</Form.Label><Form.Control type="number" min="140" max="360" step="10" value={section.cardWidth || 220} onChange={(event) => changeSection(index, "cardWidth", Number(event.target.value))} /><Form.Text>Cards scroll horizontally on smaller screens. Upload card artwork at 750 × 500 px (3:2), preferably WebP, under 300 KB. Use a clear background and include any artwork or price strip in the image.</Form.Text></Form.Group>
+              <Form.Group><Form.Label>Card width on desktop (px)</Form.Label><Form.Control type="number" min="140" max="360" step="10" value={section.cardWidth || 200} onChange={(event) => changeSection(index, "cardWidth", Number(event.target.value))} /><Form.Text>The default card is 200 px wide. Cards scroll horizontally on phones; change this only if you want larger desktop cards.</Form.Text></Form.Group>
               <div className="homepage-spotlight-editor-heading"><strong>Spotlight cards</strong><Button type="button" size="sm" variant="outline-primary" onClick={() => changeSection(index, "spotlightCards", [...(section.spotlightCards || []), { productId: "", image: "", file: null }])}>Add card</Button></div>
               {(section.spotlightCards || []).map((card, cardIndex) => {
                 const productId = String(card.productId?._id || card.productId || "");
@@ -152,7 +152,7 @@ export default function Homepage() {
                 return <div className="homepage-spotlight-editor-card" key={card._id || `spotlight-${cardIndex}`}>
                   <div className="homepage-spotlight-editor-preview">{image ? <img src={image} alt="Spotlight card preview" /> : <span>Upload a card image</span>}</div>
                   <Form.Group><Form.Label>Link to product</Form.Label><Form.Control className="mb-2" type="search" value={spotlightProductSearch[spotlightSearchKey] || ""} placeholder="Search by product, brand, or category" onChange={(event) => setSpotlightProductSearch((current) => ({ ...current, [spotlightSearchKey]: event.target.value }))} /><Form.Select value={productId} onChange={(event) => updateCard("productId", event.target.value)}><option value="">Select a product</option>{visibleSpotlightProducts.map((product) => <option key={product._id} value={product._id}>{product.name}{product.brand ? ` — ${product.brand}` : ""} — PKR ${Number(product.price || 0).toLocaleString("en-PK")}</option>)}</Form.Select>{selectedProduct && <Form.Text>Customers will open: {selectedProduct.name}</Form.Text>}{spotlightQuery && visibleSpotlightProducts.length === 0 && <Form.Text>No matching products. Try a shorter name.</Form.Text>}</Form.Group>
-                  <Form.Group><Form.Label>Card artwork</Form.Label><Form.Control type="file" accept="image/webp,image/*" onChange={(event) => updateCard("file", event.target.files?.[0] || null)} />{card.image && <Button type="button" size="sm" variant="link" className="text-danger px-0" onClick={() => { updateCard("image", ""); updateCard("file", null); }}>Remove image</Button>}</Form.Group>
+                  <Form.Group><Form.Label>Card artwork</Form.Label><div className="homepage-image-guidance"><strong>Recommended: 750 × 500 px (3:2), WebP, under 300 KB.</strong><span>The storefront crops to a 3:2 card. Keep text and important artwork away from the edges.</span></div><Form.Control type="file" accept="image/webp,image/*" onChange={(event) => updateCard("file", event.target.files?.[0] || null)} />{card.image && <Button type="button" size="sm" variant="link" className="text-danger px-0" onClick={() => { updateCard("image", ""); updateCard("file", null); }}>Remove image</Button>}</Form.Group>
                   <div className="homepage-spotlight-card-actions"><Button type="button" size="sm" variant="outline-secondary" disabled={cardIndex === 0} onClick={() => moveCard(-1)}>↑</Button><Button type="button" size="sm" variant="outline-secondary" disabled={cardIndex === section.spotlightCards.length - 1} onClick={() => moveCard(1)}>↓</Button><Button type="button" size="sm" variant="outline-danger" onClick={() => changeSection(index, "spotlightCards", section.spotlightCards.filter((_, itemIndex) => itemIndex !== cardIndex))}>Delete card</Button></div>
                 </div>;
               })}

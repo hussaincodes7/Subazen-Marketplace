@@ -125,6 +125,7 @@
 }
 .order-customer-design { align-items: flex-start; display: flex; gap: .65rem; margin: .55rem 0 .8rem; min-width: 0; }
 .order-customer-design > a { flex: 0 0 64px; }
+.order-customer-design-pdf { align-items: center; background: #fff1f0; border: 1px solid #ffd5d2; border-radius: .45rem; color: #b42318; display: flex; font-size: .8rem; font-weight: 800; height: 64px; justify-content: center; width: 64px; }
 .order-customer-design img { background: #f5f7fa; border: 1px solid #dce3ec; border-radius: .45rem; display: block; height: 64px; object-fit: contain; width: 64px; }
 .order-customer-design > div { color: #59677a; font-size: .76rem; min-width: 0; overflow-wrap: anywhere; }
 .order-customer-design > div > strong { color: #253247; }

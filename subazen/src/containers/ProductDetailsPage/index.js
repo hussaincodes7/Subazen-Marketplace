@@ -50,6 +50,13 @@ const ProductDetailsPage = (props) => {
   const [selectionError, setSelectionError] = useState("");
   const [designUploading, setDesignUploading] = useState(false);
   const [designPreviewUrls, setDesignPreviewUrls] = useState({ front: "", back: "" });
+  const selectDesignFile = (side, file) => {
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(file.type) && !/\.pdf$/i.test(file.name)) { setDesignError("Choose a JPG, PNG, WebP, or PDF file."); return; }
+    if (file.size > 10 * 1024 * 1024) { setDesignError("Artwork must be 10 MB or smaller."); return; }
+    setDesignFiles((current) => ({ ...current, [side]: file }));
+    setDesignError("");
+  };
   const [imageIndex, setImageIndex] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
   const zoomCloseRef = useRef(null);
@@ -283,10 +290,10 @@ const ProductDetailsPage = (props) => {
           {requiresCustomerDesign && <section className="product-custom-design" aria-labelledby="custom-design-title">
             <h2 id="custom-design-title">Add your print design</h2>
             {product.customDesignGuidelines?.trim() && <><p className={`product-design-guidelines ${product.customDesignGuidelines.length > 260 ? "product-detail-value-preview" : ""}`}>{product.customDesignGuidelines}</p>{product.customDesignGuidelines.length > 260 && <button type="button" className="product-description-read-button" onClick={() => setReadModal({ title: "Additional product information", text: product.customDesignGuidelines })}>Read full text</button>}</>}
-            <p>Upload the image you want printed. JPG, PNG, or WebP, up to 10 MB.</p>
+            <p>Drop your artwork here or choose a file. JPG, PNG, WebP, or PDF, up to 10 MB.</p>
             {(printPlacement === "front-and-back" ? ["front", "back"] : [printPlacement === "back" ? "back" : "front"]).map((side) => <div className="product-design-side" key={side}>
-              <label className="product-design-upload" htmlFor={`artwork-${side}`}>Artwork for {side} <span className="required-label">Required</span><input id={`artwork-${side}`} type="file" accept="image/jpeg,image/png,image/webp" aria-invalid={Boolean(designError && !designFiles[side])} onChange={(event) => { setDesignFiles((current) => ({ ...current, [side]: event.target.files?.[0] || null })); setDesignError(""); }} /></label>
-              {designFiles[side] && <div className="product-design-selected"><img src={designPreviewUrls[side]} alt={`Preview of artwork for ${side}`} /><span>{designFiles[side].name}</span><button type="button" onClick={() => setDesignFiles((current) => ({ ...current, [side]: null }))}>Remove</button></div>}
+              <label className="product-design-upload" htmlFor={`artwork-${side}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); selectDesignFile(side, event.dataTransfer.files?.[0]); }}>Drop artwork for {side} here or choose a file <span className="required-label">Required</span><input id={`artwork-${side}`} type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" aria-invalid={Boolean(designError && !designFiles[side])} onChange={(event) => selectDesignFile(side, event.target.files?.[0])} /></label>
+              {designFiles[side] && <div className="product-design-selected">{designFiles[side].type === "application/pdf" || /\.pdf$/i.test(designFiles[side].name) ? <span className="product-design-pdf" aria-label="PDF artwork">PDF</span> : <img src={designPreviewUrls[side]} alt={`Preview of artwork for ${side}`} />}<span>{designFiles[side].name}</span><button type="button" onClick={() => setDesignFiles((current) => ({ ...current, [side]: null }))}>Remove</button></div>}
             </div>)}
             {allowDesignInstructions && <label className="product-design-instructions">Print instructions (optional)<textarea maxLength={1000} rows={3} value={designInstructions} onChange={(event) => setDesignInstructions(event.target.value)} placeholder="For example: center the artwork on the front" /></label>}
             {designError && <p className="product-cart-error" role="alert">{designError}</p>}

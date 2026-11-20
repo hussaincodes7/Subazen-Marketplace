@@ -24,6 +24,15 @@ exports.uploadCustomerDesign = async (req, res) => {
     if (!product) { if (req.file) fs.promises.unlink(req.file.path).catch(() => {}); return res.status(404).json({ message: "Product not found or inactive" }); }
     if (!await productRequiresDesign(product)) { if (req.file) fs.promises.unlink(req.file.path).catch(() => {}); return res.status(400).json({ message: "Design uploads are only available for Printing products." }); }
     if (!req.file) return res.status(400).json({ message: "Choose an image of your design to upload." });
+    if (req.file.mimetype === "application/pdf") {
+      const handle = await fs.promises.open(req.file.path, "r");
+      const signature = Buffer.alloc(5);
+      try { await handle.read(signature, 0, signature.length, 0); } finally { await handle.close(); }
+      if (signature.toString("ascii") !== "%PDF-") {
+        await fs.promises.unlink(req.file.path).catch(() => {});
+        return res.status(400).json({ message: "That file is not a valid PDF." });
+      }
+    }
     const side = String(req.query.side || req.body?.side || "design").toLowerCase();
     if (!["design", "front", "back"].includes(side)) {
       await fs.promises.unlink(req.file.path).catch(() => {});

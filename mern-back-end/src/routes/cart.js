@@ -13,14 +13,15 @@ const designUpload = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, uploadPath),
     filename: (_req, file, cb) => {
-      const extByMime = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp" };
-      cb(null, `${shortid.generate()}${extByMime[file.mimetype] || ".img"}`);
+      const extByMime = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "application/pdf": ".pdf" };
+      const extension = extByMime[file.mimetype] || (/\.pdf$/i.test(file.originalname) ? ".pdf" : ".img");
+      cb(null, `${shortid.generate()}${extension}`);
     }
   }),
   limits: { fileSize: 10 * 1024 * 1024, files: 1 },
-  fileFilter: (_req, file, cb) => ["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)
+  fileFilter: (_req, file, cb) => (["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(file.mimetype) || /\.pdf$/i.test(file.originalname))
     ? cb(null, true)
-    : cb(new Error("Upload your design as a JPG, PNG, or WebP image."))
+    : cb(new Error("Upload your design as a JPG, PNG, WebP image, or PDF."))
 });
 const handleDesignUpload = (req, res, next) => designUpload.single("design")(req, res, (error) => {
   if (!error) return next();

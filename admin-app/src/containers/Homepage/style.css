@@ -47,11 +47,11 @@
 .homepage-preview-items.is-slider > * { flex: 0 0 6rem; scroll-snap-align: start; }
 .homepage-spotlight-editor-heading { align-items: center; display: flex; flex-wrap: wrap; gap: .5rem; justify-content: space-between; }
 .homepage-spotlight-editor-card { background: #f8fafc; border: 1px solid #e1e7ef; border-radius: .55rem; display: grid; gap: .75rem; padding: .75rem; }
-.homepage-spotlight-editor-preview { align-items: center; aspect-ratio: 3 / 2; background: #eef1f5; border-radius: .45rem; color: #657286; display: flex; justify-content: center; max-width: 32rem; overflow: hidden; }
+.homepage-spotlight-editor-preview { align-items: center; aspect-ratio: 3 / 2; background: #eef1f5; border-radius: .45rem; color: #657286; display: flex; justify-content: center; max-width: 20rem; overflow: hidden; }
 .homepage-spotlight-editor-preview img { height: 100%; object-fit: cover; width: 100%; }
 .homepage-spotlight-card-actions { align-items: center; display: flex; flex-wrap: wrap; gap: .4rem; }
 .homepage-spotlight-preview { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .4rem; }
-.homepage-spotlight-preview .homepage-spotlight-card { background: #f4f5f6; border-radius: .5rem; flex: 0 0 min(var(--spotlight-card-width, 250px), 72vw); overflow: hidden; }
+.homepage-spotlight-preview .homepage-spotlight-card { background: #f4f5f6; border-radius: .5rem; flex: 0 0 min(var(--spotlight-card-width, 200px), 72vw); overflow: hidden; }
 .homepage-spotlight-preview .homepage-spotlight-card > img, .homepage-spotlight-empty { aspect-ratio: 3 / 2; display: block; object-fit: cover; width: 100%; }
 .homepage-spotlight-empty { align-items: center; color: #64748b; display: flex; justify-content: center; }
 .homepage-spotlight-preview .homepage-spotlight-card > strong { display: block; font-size: .72rem; overflow: hidden; padding: .25rem .35rem; text-overflow: ellipsis; white-space: nowrap; }

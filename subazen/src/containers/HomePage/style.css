@@ -66,7 +66,7 @@
 .home-spotlight-section .home-section-heading h2 { font-size: clamp(1.2rem, 2.4vw, 1.55rem); margin: 0; }
 .home-spotlight-carousel, .home-recommendation-carousel { min-width: 0; position: relative; }
 .home-spotlight-track, .home-recommendation-track { display: flex; gap: clamp(.65rem, 1.8vw, 1.15rem); overflow-x: auto; overscroll-behavior-inline: contain; padding: .1rem .05rem .55rem; scroll-snap-type: x mandatory; scrollbar-width: thin; }
-.home-spotlight-card { background: #f4f5f6; border-radius: .9rem; display: block; flex: 0 0 min(var(--spotlight-card-width, 220px), 68vw); overflow: hidden; scroll-snap-align: start; }
+.home-spotlight-card { background: #f4f5f6; border-radius: .9rem; display: block; flex: 0 0 min(var(--spotlight-card-width, 200px), 68vw); overflow: hidden; scroll-snap-align: start; }
 .home-spotlight-card img { aspect-ratio: 3 / 2; display: block; height: auto; object-fit: cover; width: 100%; }
 .home-spotlight-card-empty { align-items: center; aspect-ratio: 3 / 2; color: #536174; display: flex; justify-content: center; padding: 1rem; text-align: center; }
 .home-recommendation-track > * { flex: 0 0 min(205px, 70vw); scroll-snap-align: start; }
@@ -75,7 +75,7 @@
 .home-random-loading { color: #68768a; padding: .9rem; text-align: center; }
 @media (max-width: 640px) {
   .home-spotlight-section { padding: .9rem 0 1rem; }
-  .home-spotlight-card { border-radius: .65rem; flex-basis: min(var(--spotlight-card-width, 220px), 68vw); }
+  .home-spotlight-card { border-radius: .65rem; flex-basis: min(var(--spotlight-card-width, 200px), 68vw); }
   .home-spotlight-next { height: 2.2rem; right: .2rem; width: 2.2rem; }
   .home-recommendation-track > * { flex-basis: min(165px, 44vw); }
   .home-spotlight-track, .home-recommendation-track { scrollbar-width: none; }

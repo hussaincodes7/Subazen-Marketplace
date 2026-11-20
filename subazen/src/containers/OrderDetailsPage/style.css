@@ -19,6 +19,7 @@
 .order-detail-customer-design > strong { color: #253247; }
 .order-detail-customer-design a { align-items: center; display: inline-flex; gap: .4rem; }
 .order-detail-customer-design img { background: #fff; border: 1px solid #dce3ec; border-radius: .35rem; height: 48px; object-fit: contain; width: 48px; }
+.order-detail-customer-design .order-detail-pdf { align-items: center; background: #fff1f0; border: 1px solid #ffd5d2; border-radius: .35rem; color: #b42318; display: inline-flex; font-size: .7rem; font-weight: 800; height: 48px; justify-content: center; width: 48px; }
 .order-detail-customer-design p { margin: .2rem 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
 .delItemName { color: #27364a; font-size: .88rem; line-height: 1.5; margin-bottom: .3rem; overflow-wrap: anywhere; }
 .order-detail-quantity { color: #718096; font-size: .8rem; margin-top: .45rem; }

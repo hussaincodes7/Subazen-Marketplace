@@ -30,6 +30,6 @@ exports.productIsCustomPrintingCategory = async (product) => {
 
 exports.normalizeDesignImage = (value) => {
   const filename = String(value || "").split("/").pop().split("?")[0];
-  if (!/^[A-Za-z0-9_-]{6,80}\.(?:png|jpe?g|webp)$/i.test(filename)) return "";
+  if (!/^[A-Za-z0-9_-]{6,80}\.(?:png|jpe?g|webp|pdf)$/i.test(filename)) return "";
   return `/public/${encodeURIComponent(filename)}`;
 };

@@ -132,7 +132,7 @@ export default function HomePage() {
         if (section.type === "text") return <section className="home-cms-text" key={section._id || sectionIndex}><h2>{section.title}</h2><p>{section.description}</p></section>;
         if (section.type === "spotlight") return <section className="home-spotlight-section" key={section._id || sectionIndex}>
           <div className="home-section-heading"><h2>{section.title || "In The Spotlight"}</h2></div>
-          <div className="home-spotlight-carousel"><div className="home-spotlight-track" style={{ "--spotlight-card-width": `${Math.max(140, Math.min(360, Number(section.cardWidth) === 250 ? 220 : (Number(section.cardWidth) || 220)))}px` }}>
+          <div className="home-spotlight-carousel"><div className="home-spotlight-track" style={{ "--spotlight-card-width": `${Math.max(140, Math.min(360, [220, 250].includes(Number(section.cardWidth)) ? 200 : (Number(section.cardWidth) || 200)))}px` }}>
             {(section.spotlightCards || []).map((card) => { const product = card.productId && typeof card.productId === "object" ? card.productId : null; if (!product?.slug) return null; return <Link className="home-spotlight-card" to={`/products/${product.slug}`} key={card._id || product._id} aria-label={`View ${product.name}`}>
               {card.image ? <img src={generatePublicUrl(card.image)} alt={product.name} loading="lazy" /> : <div className="home-spotlight-card-empty">{product.name}</div>}
             </Link>; })}

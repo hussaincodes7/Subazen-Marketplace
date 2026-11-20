@@ -205,9 +205,11 @@
 .product-custom-design h2 { color: #172434; font-size: 1rem; margin: 0 0 .35rem; }
 .product-custom-design > p { color: #64748b; font-size: .85rem; margin: 0 0 .8rem; }
 .product-design-upload, .product-design-instructions { color: #344256; display: grid; font-size: .85rem; font-weight: 650; gap: .4rem; margin-top: .7rem; }
+.product-design-upload { background: #fff; border: 1px dashed #a9b9ce; border-radius: .5rem; cursor: pointer; padding: .7rem; }
 .product-design-upload input { background: #fff; border: 1px solid #d5deea; border-radius: .45rem; font: inherit; max-width: 100%; padding: .55rem; }
 .product-design-selected { align-items: center; color: #536174; display: flex; flex-wrap: wrap; font-size: .8rem; gap: .55rem; margin-top: .6rem; }
 .product-design-selected img { background: #fff; border: 1px solid #dce3ec; border-radius: .4rem; height: 56px; object-fit: contain; width: 56px; }
+.product-design-selected .product-design-pdf { align-items: center; background: #fff1f0; border: 1px solid #ffd5d2; border-radius: .4rem; color: #b42318; display: inline-flex; flex: 0 0 56px; font-size: .75rem; font-weight: 800; height: 56px; justify-content: center; width: 56px; }
 .product-design-selected span { flex: 1 1 8rem; overflow-wrap: anywhere; }
 .product-design-selected button { background: transparent; border: 0; color: #c2410c; cursor: pointer; font: inherit; font-weight: 650; }
 .product-design-instructions textarea { border: 1px solid #d5deea; border-radius: .45rem; font: inherit; min-height: 5rem; padding: .65rem; resize: vertical; width: 100%; }
