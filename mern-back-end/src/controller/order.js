@@ -7,7 +7,7 @@ const User = require("../models/user");
 const ShippingConfig = require("../models/shippingConfig");
 const { getEffectiveUnitPrice } = require("../utils/pricing");
 const { resolveProductOptionSelections, getProductOptionGroups } = require("../utils/productOptionSelections");
-const { sendOrderStatusEmail } = require("../services/email");
+const { sendOrderStatusEmail, sendNewOrderOwnerEmail } = require("../services/email");
 const { productRequiresDesign, productIsCustomPrintingCategory, normalizeDesignImage } = require("../utils/customDesign");
 const fs = require("fs");
 const path = require("path");
@@ -131,6 +131,9 @@ exports.addOrder = async (req, res) => {
     const customer = await User.findById(userId).select("firstName email").lean().exec();
     sendOrderStatusEmail(order, customer, "ordered").catch((mailError) => {
       console.error("Order confirmation email delivery failed:", mailError.message);
+    });
+    sendNewOrderOwnerEmail(order, customer).catch((mailError) => {
+      console.error("New order owner email delivery failed:", mailError.message);
     });
     return res.status(201).json({ order });
   } catch (error) {
