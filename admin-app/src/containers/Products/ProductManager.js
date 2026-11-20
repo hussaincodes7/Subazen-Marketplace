@@ -20,7 +20,7 @@ const flattenCategories = (nodes, parents = []) => (nodes || []).flatMap((node) 
     ...flattenCategories(node.children, path),
   ];
 });
-const printingCategory = (category) => /printing|custom.print/i.test(`${category?.name || ""} ${category?.slug || ""} ${(category?.path || []).join(" ")}`);
+const printingCategory = (category) => [category?.name, category?.slug, ...(category?.path || [])].some((value) => ["printingandcustomproducts", "printingcustomproducts", "photocopyandxeroxservices", "photocopyxeroxservices"].includes(String(value || "").replace(/[^a-z0-9]/gi, "").toLowerCase()));
 const fileUrl = (file) => file instanceof File ? URL.createObjectURL(file) : generatePublicUrl(file?.img || file || "");
 const placements = [ ["front", "Front print"], ["back", "Back print"], ["front-and-back", "Front and back"] ];
 

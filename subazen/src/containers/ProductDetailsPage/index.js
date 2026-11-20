@@ -83,7 +83,7 @@ const ProductDetailsPage = (props) => {
   const discountPercent = product.discountEnabled && Number(product.offer) > 0 && Number(product.offer) < 100 ? Number(product.offer) : 0;
   const price = discountPercent ? Math.round(basePrice * (100 - discountPercent) / 100) : basePrice;
   const categoryTrail = product.categoryPath || (product.category?.name ? [product.category] : []);
-  const isCustomPrintingCategory = categoryTrail.some((item) => /printing|custom[\s-]*products?/i.test(`${item.name || ""} ${item.slug || ""}`));
+  const isCustomPrintingCategory = categoryTrail.some((item) => [item.name, item.slug].some((value) => ["printingandcustomproducts", "printingcustomproducts", "photocopyandxeroxservices", "photocopyxeroxservices"].includes(String(value || "").replace(/[^a-z0-9]/gi, "").toLowerCase())));
   const requiresCustomerDesign = product.requiresCustomerDesign === true;
   const allowDesignInstructions = product.allowDesignInstructions === true;
   const configuredPrintOptions = (product.customPrintOptions || []).filter((option) => option.isAvailable !== false);

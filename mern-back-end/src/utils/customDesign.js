@@ -1,10 +1,8 @@
 const Category = require("../models/category");
 
 const isPrintingCategory = (category) => {
-  const values = [category?.name, category?.slug].map((value) => String(value || "").trim().toLowerCase());
-  if (values.some((value) => value === "printing-and-custom-products" || value.replace(/[^a-z0-9]/g, "") === "printingandcustomproducts")) return true;
-  const label = `${category?.name || ""} ${category?.slug || ""}`.toLowerCase();
-  return /(^|[^a-z])printing([^a-z]|$)/.test(label) || /custom[\s-]*(?:print(?:ed|ing)?|products?)/.test(label);
+  const supportedCategories = new Set(["printingandcustomproducts", "printingcustomproducts", "photocopyandxeroxservices", "photocopyxeroxservices"]);
+  return [category?.name, category?.slug].some((value) => supportedCategories.has(String(value || "").replace(/[^a-z0-9]/gi, "").toLowerCase()));
 };
 exports.isPrintingCategory = isPrintingCategory;
 
