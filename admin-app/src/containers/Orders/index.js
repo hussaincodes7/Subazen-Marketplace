@@ -123,7 +123,7 @@ const Orders = (props) => {
               <div className="title">Items</div>
               {(orderItem.items || []).map((item, index) => (
                 <div className="value" key={item._id || index}>
-                  {item.productId?.name || "Product no longer available"} × {item.purchasedQty}
+                  {item.productId?.name || "Product no longer available"} × {item.purchasedQty}{Number(item.minOrderQuantity) > 1 && <span className="text-muted"> · Minimum order: {item.minOrderQuantity}</span>}
                   {(item.colorName || item.size || item.printPlacement) && <span className="text-muted"> · {[item.colorName, item.size, item.printPlacement === "front-and-back" ? "Front and back print" : item.printPlacement ? `${item.printPlacement} print` : ""].filter(Boolean).join(" / ")}</span>}
                   {(item.productOptionSelections || []).length > 0 && <div className="text-muted">{item.productOptionSelections.map((option) => `${option.name}: ${option.value}${Number(option.price) > 0 ? ` (+Rs. ${Number(option.price).toLocaleString("en-PK")})` : ""}`).join(" · ")}</div>}
                   {(item.designImage || item.designImageFront || item.designImageBack) && <div className="order-customer-design">

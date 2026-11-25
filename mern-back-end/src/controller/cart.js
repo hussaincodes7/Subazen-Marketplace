@@ -55,6 +55,8 @@ exports.addItemToCart = async (req, res) => {
       if (!mongoose.isValidObjectId(entry.product) || !Number.isInteger(Number(entry.quantity)) || Number(entry.quantity) < 1) return res.status(400).json({ message: "Each cart item needs a valid product and positive quantity" });
       const product = await Product.findOne({ _id: entry.product, isActive: { $ne: false } }).exec();
       if (!product) return res.status(404).json({ message: "Product not found or inactive" });
+      const minOrderQuantity = Math.max(1, Number(product.minOrderQuantity) || 1);
+      if (Number(entry.quantity) < minOrderQuantity) return res.status(400).json({ message: `${product.name} requires a minimum order of ${minOrderQuantity} units.` });
       const requiresDesign = await productRequiresDesign(product);
       const isCustomPrinting = await productIsCustomPrintingCategory(product);
       const legacyDesignImage = normalizeDesignImage(entry.designImage);
@@ -97,7 +99,7 @@ exports.addItemToCart = async (req, res) => {
 };
 exports.getCartItems = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.auth.userId }).populate("cartItems.product", "_id name price quantity productPictures featuredImageIndex sizes colors customPrintOptions customProductOptions specifications isActive offer discountEnabled dealEnabled dealLabel").exec();
+    const cart = await Cart.findOne({ user: req.auth.userId }).populate("cartItems.product", "_id name price quantity minOrderQuantity productPictures featuredImageIndex sizes colors customPrintOptions customProductOptions specifications isActive offer discountEnabled dealEnabled dealLabel").exec();
     const cartItems = {};
     for (const item of cart?.cartItems || []) {
       const product = item.product;
@@ -115,7 +117,7 @@ exports.getCartItems = async (req, res) => {
         || "";
       const selectedOptionKey = JSON.stringify((item.productOptionSelections || []).map(({ name, value }) => ({ name, value })));
       const key = `${product._id}${variant ? `_${variant._id}` : ""}${item.size ? `_${encodeURIComponent(item.size)}` : ""}${item.printPlacement ? `_print_${item.printPlacement}` : ""}${selectedOptionKey !== "[]" ? `_options_${encodeURIComponent(selectedOptionKey)}` : ""}${item.designImageFront ? `_front_${encodeURIComponent(item.designImageFront.split("/").pop())}` : ""}${item.designImageBack ? `_back_${encodeURIComponent(item.designImageBack.split("/").pop())}` : ""}${item.designImage && !item.designImageFront && !item.designImageBack ? `_design_${encodeURIComponent(item.designImage.split("/").pop())}` : ""}`;
-      cartItems[key] = { _id: product._id.toString(), cartKey: key, name: product.name, img: image, price: unitPrice, qty: item.quantity, variantId: variant?._id?.toString() || "", colorName: variant?.colorName || "", colorCode: variant?.colorCode || "", size: item.size || "", printPlacement: item.printPlacement || "", printPrice: item.printPrice || 0, customPrintOptions: product.customPrintOptions || [], productOptionSelections: item.productOptionSelections || [], designImage: item.designImage || "", designImageFront: item.designImageFront || "", designImageBack: item.designImageBack || "", designInstructions: item.designInstructions || "" };
+      cartItems[key] = { _id: product._id.toString(), cartKey: key, name: product.name, img: image, price: unitPrice, qty: item.quantity, minOrderQuantity: Math.max(1, Number(product.minOrderQuantity) || 1), variantId: variant?._id?.toString() || "", colorName: variant?.colorName || "", colorCode: variant?.colorCode || "", size: item.size || "", printPlacement: item.printPlacement || "", printPrice: item.printPrice || 0, customPrintOptions: product.customPrintOptions || [], productOptionSelections: item.productOptionSelections || [], designImage: item.designImage || "", designImageFront: item.designImageFront || "", designImageBack: item.designImageBack || "", designInstructions: item.designInstructions || "" };
     }
     return res.status(200).json({ cartItems });
   } catch (error) { return res.status(500).json({ message: error.message }); }

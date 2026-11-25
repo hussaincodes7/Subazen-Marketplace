@@ -1,6 +1,6 @@
 const xmlEscape = (value) => String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 const trimSlash = (value) => String(value || "").replace(/\/$/, "");
-const SITE_URL = "https://subazen.com";
+const SITE_URL = "https://www.subazen.com";
 const productionBase = (value) => {
   const candidate = trimSlash(value);
   return candidate && !/(?:localhost|127(?:\.\d{1,3}){3}|\[::1\])/i.test(candidate) ? candidate : SITE_URL;
@@ -24,8 +24,8 @@ exports.sitemap = async (_req, res) => {
     const FooterSettings = require("../../models/footerSettings");
     const [products, categories, pages, brands, priceCollections, footer] = await Promise.all([
       Product.find({ isActive: { $ne: false } }).select("slug updatedAt productPictures colors featuredImageIndex").lean().exec(),
-      Category.find({ isActive: { $ne: false } }).select("_id slug type parentId updatedAt").lean().exec(),
-      Page.find({}).select("category updatedAt").lean().exec(),
+      Category.find({ isActive: { $ne: false } }).select("_id slug type parentId updatedAt categoryImage coverImage").lean().exec(),
+      Page.find({}).select("category updatedAt banners products").lean().exec(),
       Brand.find({ isActive: { $ne: false } }).select("slug categoryIds updatedAt").lean().exec(),
       PriceCollection.find({ isActive: true }).select("slug updatedAt").lean().exec(),
       FooterSettings.findOne({ key: "storefront" }).select("pages updatedAt").lean().exec(),
@@ -51,7 +51,7 @@ exports.sitemap = async (_req, res) => {
       current.images.push(...images);
       urls.set(loc, current);
     };
-    addUrl(`${base}/`, new Date());
+    addUrl(`${base}/`, footer?.updatedAt);
     addUrl(`${base}/contact`, footer?.updatedAt);
     ["about-us", "privacy-policy", "return-policy", "dmca"].forEach((slug) => addUrl(`${base}/pages/${slug}`, footer?.updatedAt));
     for (const product of products) {
@@ -62,13 +62,15 @@ exports.sitemap = async (_req, res) => {
     for (const category of categories) {
       const path = categoryPath(category);
       if (!path.length || category.type === "page") continue;
-      addUrl(`${base}/collections/${path.map(encodeURIComponent).join("/")}`, category.updatedAt);
+      const categoryImages = [category.categoryImage, category.coverImage].filter(Boolean).map((img) => ({ img }));
+      addUrl(`${base}/collections/${path.map(encodeURIComponent).join("/")}`, category.updatedAt, categoryImages);
     }
     const pageCategoryIds = new Set(pages.map((page) => String(page.category)));
     for (const page of pages) {
       const category = categoryById.get(String(page.category));
       if (!category || category.type !== "page" || !category.slug || !pageCategoryIds.has(String(category._id))) continue;
-      addUrl(`${base}/${encodeURIComponent(category.slug)}?cid=${encodeURIComponent(category._id)}&type=page`, page.updatedAt || category.updatedAt);
+      const pageImages = [...(page.banners || []), ...(page.products || [])].filter((item) => item.img).map((item) => ({ img: item.img }));
+      addUrl(`${base}/${encodeURIComponent(category.slug)}?cid=${encodeURIComponent(category._id)}&type=page`, page.updatedAt || category.updatedAt, pageImages);
     }
     for (const brand of brands) {
       if (!brand.slug) continue;
@@ -90,6 +92,7 @@ exports.sitemap = async (_req, res) => {
         .map((imageUrl) => `<image:image><image:loc>${xmlEscape(imageUrl)}</image:loc></image:image>`).join("");
       return `<url><loc>${xmlEscape(item.loc)}</loc>${lastmod}${images}</url>`;
     }).join("");
+    res.set("Cache-Control", "public, max-age=300, s-maxage=300");
     return res.status(200).type("application/xml; charset=utf-8").send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${body}</urlset>`);
   } catch (error) {
     console.error("Sitemap generation failed:", error.message);

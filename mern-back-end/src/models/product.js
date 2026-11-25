@@ -19,6 +19,7 @@ quantity:{
  type: Number,
         required: true
 },
+minOrderQuantity: { type: Number, min: 1, default: 1 },
    
 description: {
     type: String,

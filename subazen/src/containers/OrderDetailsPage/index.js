@@ -93,13 +93,13 @@ const OrderDetailsPage = (props) => {
                 <div className="delItemName">{item.productId?.name || "Product no longer available"}</div>
                 {(item.colorName || item.size || item.printPlacement) && <div className="delItemName">{[item.colorName, item.size, item.printPlacement === "front-and-back" ? "Front and back print" : item.printPlacement ? `${item.printPlacement} print` : ""].filter(Boolean).join(" · ")}</div>}
                 {(item.productOptionSelections || []).map((option) => <div className="delItemName" key={`${option.name}-${option.value}`}>{option.name}: {option.value}{Number(option.price) > 0 ? ` (+Rs. ${Number(option.price).toLocaleString("en-PK")})` : ""}</div>)}
-                <div className="order-detail-quantity">Quantity: {item.purchasedQty || 1}</div>
+                <div className="order-detail-quantity">Quantity: {item.purchasedQty || 1}</div>{Number(item.minOrderQuantity) > 1 && <div className="order-detail-quantity">Minimum order: {item.minOrderQuantity} units</div>}
                 <Price value={Number(item.payablePrice || 0) * Number(item.purchasedQty || 1)} />
                 {(item.designImage || item.designImageFront || item.designImageBack) && <div className="order-detail-customer-design">
-                  <strong>Your uploaded print design</strong>
+                  <strong>Your uploaded files</strong>
                   {[["Front", item.designImageFront], ["Back", item.designImageBack]].filter(([, url]) => url).map(([side, url]) => <a key={side} href={generatePublicUrl(url)} target="_blank" rel="noreferrer">{/\.pdf(?:\?|$)/i.test(url) ? <span className="order-detail-pdf">PDF</span> : <img src={generatePublicUrl(url)} alt={`${side} artwork for ${item.productId?.name || "this product"}`} />}<span>Open {side} {/\.pdf(?:\?|$)/i.test(url) ? "PDF" : "image"}</span></a>)}
                   {!item.designImageFront && !item.designImageBack && item.designImage && <a href={generatePublicUrl(item.designImage)} target="_blank" rel="noreferrer">{/\.pdf(?:\?|$)/i.test(item.designImage) ? <span className="order-detail-pdf">PDF</span> : <img src={generatePublicUrl(item.designImage)} alt={`Uploaded design for ${item.productId?.name || "this product"}`} />}<span>Open {/\.pdf(?:\?|$)/i.test(item.designImage) ? "PDF" : "image"}</span></a>}
-                  {item.designInstructions && <p><b>Print instructions:</b> {item.designInstructions}</p>}
+                  {item.designInstructions && <p><b>Order instructions:</b> {item.designInstructions}</p>}
                 </div>}
               </div>
             </div>

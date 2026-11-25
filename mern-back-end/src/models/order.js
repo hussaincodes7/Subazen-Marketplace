@@ -19,7 +19,8 @@ const orderSchema = new mongoose.Schema({
     designImageBack: { type: String, trim: true, default: "" },
     designInstructions: { type: String, trim: true, maxlength: 1000, default: "" },
     payablePrice: { type: Number, required: true, min: 0 },
-    purchasedQty: { type: Number, required: true, min: 1 }
+    purchasedQty: { type: Number, required: true, min: 1 },
+    minOrderQuantity: { type: Number, min: 1, default: 1 }
   }],
   paymentStatus: { type: String, enum: ["pending", "completed", "cancelled", "refund"], default: "pending", required: true },
   paymentType: { type: String, enum: ["cod"], default: "cod", required: true },

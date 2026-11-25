@@ -1,5 +1,5 @@
 export const PRODUCT_CSV_COLUMNS = [
-  "name", "category_path", "brand", "price", "quantity", "description", "image_files",
+  "name", "category_path", "brand", "price", "quantity", "minimum_order_quantity", "description", "image_files",
   "default_color_name", "sizes_json", "colors_json", "specifications_json",
   "custom_print_options_json", "custom_product_options_json", "custom_design_guidelines",
   "requires_customer_design", "allow_design_instructions", "discount_enabled", "offer",

@@ -18,7 +18,9 @@ export const addToCart = (product, delta = 1) => async (dispatch) => {
   const { auth, cart } = store.getState();
   const cartItems = { ...cart.cartItems };
   const key = cartKeyFor(product);
-  const nextQty = Math.max(1, Number(cartItems[key]?.qty || 0) + Number(delta));
+  const minimum = Math.max(1, Number(product.minOrderQuantity) || 1);
+  const currentQty = Number(cartItems[key]?.qty || 0);
+  const nextQty = currentQty > 0 ? Math.max(minimum, currentQty + Number(delta)) : Math.max(minimum, Number(delta));
   if (Number(product.stock ?? Infinity) < nextQty) {
     dispatch({ type: cartConstants.ADD_TO_CART_FAILURE, payload: { error: `Only ${product.stock} of this option are available.` } });
     return false;

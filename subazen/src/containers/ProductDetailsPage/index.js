@@ -112,6 +112,7 @@ const ProductDetailsPage = (props) => {
   const availableSizeOptions = sizeOptions.filter((item) => Number(item.quantity) > 0);
   const selectedSize = sizeOptions.find((item) => item.size === size);
   const availableStock = sizeOptions.length ? Number(selectedSize?.quantity || 0) : Number(variant?.quantity ?? product.quantity ?? 0);
+  const minOrderQuantity = Math.max(1, Number(product.minOrderQuantity) || 1);
   const sizeRequired = Boolean(sizeOptions.length && !selectedSize);
   const productOutOfStock = sizeOptions.length ? availableSizeOptions.length === 0 : availableStock <= 0;
   const imageUrl = (image) => generatePublicUrl(image?.img || "");
@@ -213,7 +214,7 @@ const ProductDetailsPage = (props) => {
     if (sizeRequired) { setSelectionError("Choose an available size to continue."); document.querySelector("#product-size-select")?.focus(); return; }
     if (printOptions.length > 0 && !selectedPrintOption) { setSelectionError("Choose front, back, or front and back printing."); document.querySelector("#product-print-select")?.focus(); return; }
     if (missingCustomProductOption) { setSelectionError(`Choose an option for ${missingCustomProductOption.name}.`); document.querySelector(`[data-custom-option="${customProductOptions.indexOf(missingCustomProductOption)}"]`)?.focus(); return; }
-    if (Number(availableStock) <= 0) return;
+    if (Number(availableStock) < minOrderQuantity) { setSelectionError(`This product requires at least ${minOrderQuantity} units, but only ${availableStock} are available.`); return; }
     setSelectionError("");
     setDesignError("");
     let designImage = "";
@@ -241,7 +242,7 @@ const ProductDetailsPage = (props) => {
         return;
       }
     }
-    const entry = { _id: product._id, name: product.name, price: displayPrice, img: imageUrl(pictures[0]), variantId: variant?._id || "", colorName: variant?.colorName || "", colorCode: variant?.colorCode || "", size, printPlacement, productOptionSelections: selectedProductOptionSelections, stock: availableStock, designImage, designImageFront, designImageBack, designInstructions: allowDesignInstructions ? designInstructions.trim() : "" };
+    const entry = { _id: product._id, name: product.name, price: displayPrice, img: imageUrl(pictures[0]), variantId: variant?._id || "", colorName: variant?.colorName || "", colorCode: variant?.colorCode || "", size, printPlacement, productOptionSelections: selectedProductOptionSelections, stock: availableStock, minOrderQuantity, designImage, designImageFront, designImageBack, designInstructions: allowDesignInstructions ? designInstructions.trim() : "" };
     const added = await dispatch(addToCart(entry));
     setDesignUploading(false);
     if (added) props.history.push("/cart");
@@ -277,7 +278,8 @@ const ProductDetailsPage = (props) => {
           <h1>{product.name}</h1>{productOutOfStock && <p className="product-stock">Out of stock</p>}
           {product.dealEnabled && product.dealLabel?.trim() && <div className="product-deal-badge">{product.dealLabel}</div>}
           <div className="product-current-price"><Price value={displayPrice} fontSize="1.75rem" />{!selectedPrintOption && discountPercent > 0 && <div className="product-price-meta"><del>Rs. {basePrice.toLocaleString("en-PK")}</del><span>{discountPercent}% off</span></div>}</div>
-          {colors.length > 0 && <fieldset className="product-option-group"><legend>Color: {variant?.colorName}</legend><div className="product-color-options">{colors.map((color, index) => <button type="button" key={color._id || index} className={index === colorIndex ? "selected" : ""} aria-label={color.colorName} aria-pressed={index === colorIndex} onClick={() => { setColorIndex(index); setImageIndex(0); setSize(""); setZoomOpen(false); }}><span style={{ backgroundColor: color.colorCode }} />{color.colorName}</button>)}</div></fieldset>}
+          <p className="product-minimum-order">Minimum order: <strong>{minOrderQuantity} {minOrderQuantity === 1 ? "unit" : "units"}</strong></p>
+          {colors.length > 0 && <fieldset className="product-option-group"><legend>Color: {variant?.colorName}</legend><div className="product-color-options">{colors.map((color, index) => <button type="button" key={color._id || index} className={index === colorIndex ? "selected" : ""} aria-label={color.colorName} aria-pressed={index === colorIndex} onClick={() => { setColorIndex(index); setImageIndex(0); setSize(""); setZoomOpen(false); setSelectionError(""); }}><span style={{ backgroundColor: color.colorCode }} />{color.colorName}</button>)}</div></fieldset>}
           <div className="product-option-selectors">
           {sizeOptions.length > 0 && <label className="product-option-group">Size<select id="product-size-select" className={selectionError && sizeRequired ? "needs-selection" : ""} value={size} onChange={(event) => { setSize(event.target.value); setSelectionError(""); }} disabled={!availableSizeOptions.length}><option value="">{availableSizeOptions.length ? "Select size" : "No sizes available"}</option>{sizeOptions.map((item) => {
             const inStock = Number(item.quantity) > 0;
@@ -288,17 +290,17 @@ const ProductDetailsPage = (props) => {
           </div>
           {selectionError && <p className="product-cart-error" role="alert">{selectionError}</p>}
           {requiresCustomerDesign && <section className="product-custom-design" aria-labelledby="custom-design-title">
-            <h2 id="custom-design-title">Add your print design</h2>
+            <h2 id="custom-design-title">Add files for your order</h2>
             {product.customDesignGuidelines?.trim() && <><p className={`product-design-guidelines ${product.customDesignGuidelines.length > 260 ? "product-detail-value-preview" : ""}`}>{product.customDesignGuidelines}</p>{product.customDesignGuidelines.length > 260 && <button type="button" className="product-description-read-button" onClick={() => setReadModal({ title: "Additional product information", text: product.customDesignGuidelines })}>Read full text</button>}</>}
-            <p>Drop your artwork here or choose a file. JPG, PNG, WebP, or PDF, up to 10 MB.</p>
+            <p>Upload the files needed for this order. JPG, PNG, WebP, or PDF, up to 10 MB.</p>
             {(printPlacement === "front-and-back" ? ["front", "back"] : [printPlacement === "back" ? "back" : "front"]).map((side) => <div className="product-design-side" key={side}>
-              <label className="product-design-upload" htmlFor={`artwork-${side}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); selectDesignFile(side, event.dataTransfer.files?.[0]); }}>Drop artwork for {side} here or choose a file <span className="required-label">Required</span><input id={`artwork-${side}`} type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" aria-invalid={Boolean(designError && !designFiles[side])} onChange={(event) => selectDesignFile(side, event.target.files?.[0])} /></label>
+              <label className="product-design-upload" htmlFor={`artwork-${side}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); selectDesignFile(side, event.dataTransfer.files?.[0]); }}>Drop a file for {side} here or choose a file <span className="required-label">Required</span><input id={`artwork-${side}`} type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" aria-invalid={Boolean(designError && !designFiles[side])} onChange={(event) => selectDesignFile(side, event.target.files?.[0])} /></label>
               {designFiles[side] && <div className="product-design-selected">{designFiles[side].type === "application/pdf" || /\.pdf$/i.test(designFiles[side].name) ? <span className="product-design-pdf" aria-label="PDF artwork">PDF</span> : <img src={designPreviewUrls[side]} alt={`Preview of artwork for ${side}`} />}<span>{designFiles[side].name}</span><button type="button" onClick={() => setDesignFiles((current) => ({ ...current, [side]: null }))}>Remove</button></div>}
             </div>)}
-            {allowDesignInstructions && <label className="product-design-instructions">Print instructions (optional)<textarea maxLength={1000} rows={3} value={designInstructions} onChange={(event) => setDesignInstructions(event.target.value)} placeholder="For example: center the artwork on the front" /></label>}
+            {allowDesignInstructions && <label className="product-design-instructions">Additional instructions (optional)<textarea maxLength={1000} rows={3} value={designInstructions} onChange={(event) => setDesignInstructions(event.target.value)} placeholder="Share any details needed to fulfill this order" /></label>}
             {designError && <p className="product-cart-error" role="alert">{designError}</p>}
           </section>}
-          <div className="product-detail-actions"><MaterialButton title={designUploading ? "UPLOADING DESIGN…" : "ADD TO CART"} onClick={addSelected} bgColor="#ff6b1b" textColor="#fff" disabled={designUploading || productOutOfStock || cart.updatingCart} /></div>
+          <div className="product-detail-actions"><MaterialButton title={designUploading ? "UPLOADING FILES…" : "ADD TO CART"} onClick={addSelected} bgColor="#ff6b1b" textColor="#fff" disabled={designUploading || productOutOfStock || cart.updatingCart} /></div>
           {cart.error && !/invalid or expired token/i.test(cart.error) && <p className="product-cart-error" role="alert">{cart.error}</p>}
           <div className="product-cod-note">Cash on Delivery available. Shipping fee is shown at checkout.</div>
           {detailTabs.length > 0 && <section className="product-all-details">

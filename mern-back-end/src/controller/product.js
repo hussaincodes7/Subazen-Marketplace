@@ -211,6 +211,8 @@ exports.createProduct = async (req, res) => {
     const {
         name, price, description, category, quantity, createdBy
     } = req.body;
+    const minOrderQuantity = req.body.minOrderQuantity == null || String(req.body.minOrderQuantity).trim() === '' ? 1 : Number(req.body.minOrderQuantity);
+    if (!Number.isInteger(minOrderQuantity) || minOrderQuantity < 1) return res.status(400).json({ error: 'Minimum order quantity must be a whole number of at least 1.' });
     const files = getUploadedFiles(req);
     const productPictures = files
         .filter((file) => file.fieldname === 'productPicture')
@@ -252,6 +254,7 @@ exports.createProduct = async (req, res) => {
         slug: productSlug,
         price,
         quantity: baseQuantity,
+        minOrderQuantity,
         description,
         offer,
         discountEnabled: req.body.discountEnabled === 'true',
@@ -287,6 +290,8 @@ exports.updateProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.productId).exec();
         if (!product) return res.status(404).json({ message: 'Product not found.' });
+        const minOrderQuantity = req.body.minOrderQuantity == null || String(req.body.minOrderQuantity).trim() === '' ? (product.minOrderQuantity || 1) : Number(req.body.minOrderQuantity);
+        if (!Number.isInteger(minOrderQuantity) || minOrderQuantity < 1) return res.status(400).json({ error: 'Minimum order quantity must be a whole number of at least 1.' });
 
         const files = getUploadedFiles(req);
         const currentProductPictures = (product.productPictures || []).map((picture) => ({ img: picture.img }));
@@ -357,6 +362,7 @@ exports.updateProduct = async (req, res) => {
         const changes = {
             name: req.body.name,
             quantity: baseQuantity,
+            minOrderQuantity,
             price: req.body.price,
             description: req.body.description,
             offer,

@@ -57,6 +57,7 @@ exports.addOrder = async (req, res) => {
     for (const item of cart.cartItems) {
       const product = await Product.findOne({ _id: item.product, isActive: { $ne: false } }).exec();
       if (!product) return res.status(400).json({ message: "A product in your cart is no longer available" });
+      const minOrderQuantity = Math.max(1, Number(product.minOrderQuantity) || 1);
       const requiresDesign = await productRequiresDesign(product);
       const isCustomPrinting = await productIsCustomPrintingCategory(product);
       const legacyDesignImage = normalizeDesignImage(item.designImage);
@@ -96,10 +97,11 @@ exports.addOrder = async (req, res) => {
         }
       }
       if (!Number.isInteger(item.quantity) || item.quantity < 1) return res.status(400).json({ message: "Invalid cart quantity" });
+      if (item.quantity < minOrderQuantity) return res.status(400).json({ message: `${product.name} requires a minimum order of ${minOrderQuantity} units.` });
       if (stockAvailable < item.quantity) return res.status(409).json({ message: `${product.name} does not have enough stock` });
       stockChanges.push({ product, variant, sizeItem, item, stockPath });
       subtotal += unitPrice * item.quantity;
-      orderItems.push({ productId: product._id, variantId: variant?._id, colorName: variant?.colorName || item.colorName, size: item.size, printPlacement, printPrice: printPrice ?? 0, productOptionSelections, designImage, designImageFront, designImageBack, designInstructions, payablePrice: unitPrice, purchasedQty: item.quantity });
+      orderItems.push({ productId: product._id, variantId: variant?._id, colorName: variant?.colorName || item.colorName, size: item.size, printPlacement, printPrice: printPrice ?? 0, productOptionSelections, designImage, designImageFront, designImageBack, designInstructions, payablePrice: unitPrice, purchasedQty: item.quantity, minOrderQuantity });
     }
     const config = await getShippingConfig();
     const shippingFee = calculateShipping(config, address);
