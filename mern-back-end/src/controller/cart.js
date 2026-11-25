@@ -71,8 +71,8 @@ exports.addItemToCart = async (req, res) => {
       const instructionsEnabled = typeof product.allowDesignInstructions === "boolean" ? product.allowDesignInstructions : requiresDesign;
       const designInstructions = instructionsEnabled ? String(entry.designInstructions || "").trim().slice(0, 1000) : "";
       const configuredPrintOptions = (product.customPrintOptions || []).filter((option) => option.isAvailable !== false);
-      const printPlacement = isCustomPrinting ? String(entry.printPlacement || "") : "";
-      if (isCustomPrinting && !["front", "back", "front-and-back"].includes(printPlacement)) return res.status(400).json({ message: "Choose front, back, or front and back printing." });
+      const printPlacement = configuredPrintOptions.length ? String(entry.printPlacement || "") : "";
+      if (configuredPrintOptions.length && !["front", "back", "front-and-back"].includes(printPlacement)) return res.status(400).json({ message: "Choose a configured print side for this product." });
       const printOption = configuredPrintOptions.find((option) => option.placement === printPlacement);
       if (configuredPrintOptions.length && !printOption) return res.status(400).json({ message: "Choose a printing side for this custom product." });
       const printPrice = printOption ? Number(printOption.price) : null;
