@@ -219,7 +219,7 @@ exports.createProduct = async (req, res) => {
         .map((file) => ({ img: file.filename }));
     const printingProduct = await categoryUsesCustomPrinting(category);
     const defaultColorName = String(req.body.defaultColorName || '').trim().slice(0, 60);
-    const requiresCustomerDesign = printingProduct && req.body.requiresCustomerDesign === 'true';
+    const requiresCustomerDesign = req.body.requiresCustomerDesign === 'true';
     const allowDesignInstructions = requiresCustomerDesign && req.body.allowDesignInstructions === 'true';
     const submittedColors = readColors(req);
     if (printingProduct && submittedColors.some((color) => color.useProductPictures && !color.colorName) && !defaultColorName) return res.status(400).json({ error: 'Enter the default color name for the main product images.' });
@@ -243,7 +243,7 @@ exports.createProduct = async (req, res) => {
         return res.status(400).json({ error: 'Variant stock must use non-negative whole numbers and each size needs a size name.' });
     }
     if (colors.some((color) => new Set(color.sizes.map((size) => size.size.toLowerCase())).size !== color.sizes.length)) return res.status(400).json({ error: 'Size names must be unique within each color.' });
-    const customPrintOptions = readCustomPrintOptions(req.body.customPrintOptions, printingProduct);
+    const customPrintOptions = readCustomPrintOptions(req.body.customPrintOptions, true);
     const customProductOptions = readCustomProductOptions(req.body.customProductOptions || '[]');
 
     const productBaseSlug = slugify(name, { lower: true, strict: true }) || shortid.generate();
@@ -321,7 +321,7 @@ exports.updateProduct = async (req, res) => {
         const categoryId = req.body.category || product.category;
         const printingProduct = await categoryUsesCustomPrinting(categoryId);
         const defaultColorName = String(req.body.defaultColorName ?? product.defaultColorName ?? '').trim().slice(0, 60);
-        const requiresCustomerDesign = printingProduct && (req.body.requiresCustomerDesign === undefined
+        const requiresCustomerDesign = (req.body.requiresCustomerDesign === undefined
             ? product.requiresCustomerDesign === true
             : req.body.requiresCustomerDesign === 'true');
         const allowDesignInstructions = requiresCustomerDesign && (req.body.allowDesignInstructions === undefined
@@ -356,7 +356,7 @@ exports.updateProduct = async (req, res) => {
             return res.status(400).json({ error: 'Variant stock must use non-negative whole numbers and each size needs a size name.' });
         }
         if (colors.some((color) => new Set(color.sizes.map((size) => size.size.toLowerCase())).size !== color.sizes.length)) return res.status(400).json({ error: 'Size names must be unique within each color.' });
-        const customPrintOptions = readCustomPrintOptions(req.body.customPrintOptions ?? product.customPrintOptions, printingProduct);
+        const customPrintOptions = readCustomPrintOptions(req.body.customPrintOptions ?? product.customPrintOptions, true);
         const customProductOptions = readCustomProductOptions(req.body.customProductOptions ?? product.customProductOptions ?? []);
 
         const changes = {

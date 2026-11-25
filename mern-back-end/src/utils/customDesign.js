@@ -12,6 +12,8 @@ exports.productRequiresDesign = async (product) => {
 };
 
 exports.productIsCustomPrintingCategory = async (product) => {
+  // Explicit product-level print settings make the options available in every category.
+  if (product?.requiresCustomerDesign === true || (product?.customPrintOptions || []).length > 0) return true;
   let category = product?.category && typeof product.category === "object" && (product.category.name || product.category.slug)
     ? product.category
     : await Category.findById(product?.category).select("_id name slug parentId").lean().exec();

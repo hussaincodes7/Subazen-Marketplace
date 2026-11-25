@@ -88,7 +88,7 @@ const ProductDetailsPage = (props) => {
   const allowDesignInstructions = product.allowDesignInstructions === true;
   const configuredPrintOptions = (product.customPrintOptions || []).filter((option) => option.isAvailable !== false);
   // Placement prices are final product prices, not add-on printing fees.
-  const printOptions = isCustomPrintingCategory ? configuredPrintOptions : [];
+  const printOptions = configuredPrintOptions;
   const legacyOptionGroups = Object.values((product.specifications || []).reduce((groups, item) => {
     const name = String(item.name || "").trim();
     const value = String(item.value || "").trim();
@@ -98,7 +98,7 @@ const ProductDetailsPage = (props) => {
     groups[key].options.push({ value });
     return groups;
   }, {}));
-  const customProductOptions = isCustomPrintingCategory ? ((product.customProductOptions || []).length ? product.customProductOptions : legacyOptionGroups) : [];
+  const customProductOptions = (product.customProductOptions || []).length ? product.customProductOptions : (isCustomPrintingCategory ? legacyOptionGroups : []);
   const selectedPrintOption = printOptions.find((option) => option.placement === printPlacement);
   const selectedProductOptionSelections = customProductOptions.map((group, index) => {
     const value = customOptionSelections[index] || "";
@@ -211,8 +211,8 @@ const ProductDetailsPage = (props) => {
   if (state.loading && !product._id) return <Layout><main className="product-page-state">Loading product…</main></Layout>;
   if (!product._id) return <Layout><main className="product-page-state">Product not found. <a href="/">Return to Subazen</a></main></Layout>;
   const addSelected = async () => {
-    if (sizeRequired) { setSelectionError("Choose an available size to continue."); document.querySelector("#product-size-select")?.focus(); return; }
-    if (printOptions.length > 0 && !selectedPrintOption) { setSelectionError("Choose front, back, or front and back printing."); document.querySelector("#product-print-select")?.focus(); return; }
+    if (sizeRequired) { setSelectionError("Choose an available size."); document.querySelector("#product-size-select")?.focus(); return; }
+    if (printOptions.length > 0 && !selectedPrintOption) { setSelectionError("Choose a print side."); document.querySelector("#product-print-select")?.focus(); return; }
     if (missingCustomProductOption) { setSelectionError(`Choose an option for ${missingCustomProductOption.name}.`); document.querySelector(`[data-custom-option="${customProductOptions.indexOf(missingCustomProductOption)}"]`)?.focus(); return; }
     if (Number(availableStock) < minOrderQuantity) { setSelectionError(`This product requires at least ${minOrderQuantity} units, but only ${availableStock} are available.`); return; }
     setSelectionError("");
@@ -223,7 +223,7 @@ const ProductDetailsPage = (props) => {
     if (requiresCustomerDesign) {
       const requiredSides = printPlacement === "front-and-back" ? ["front", "back"] : [printPlacement === "back" ? "back" : "front"];
       const missingSide = requiredSides.find((side) => !designFiles[side]);
-      if (missingSide) { setDesignError(`Please upload the artwork for the ${missingSide}.`); document.querySelector(`#artwork-${missingSide}`)?.focus(); return; }
+      if (missingSide) { setDesignError(`Upload the required file for the ${missingSide}.`); document.querySelector(`#artwork-${missingSide}`)?.focus(); return; }
       setDesignUploading(true);
       try {
         for (const side of requiredSides) {
@@ -278,7 +278,7 @@ const ProductDetailsPage = (props) => {
           <h1>{product.name}</h1>{productOutOfStock && <p className="product-stock">Out of stock</p>}
           {product.dealEnabled && product.dealLabel?.trim() && <div className="product-deal-badge">{product.dealLabel}</div>}
           <div className="product-current-price"><Price value={displayPrice} fontSize="1.75rem" />{!selectedPrintOption && discountPercent > 0 && <div className="product-price-meta"><del>Rs. {basePrice.toLocaleString("en-PK")}</del><span>{discountPercent}% off</span></div>}</div>
-          <p className="product-minimum-order">Minimum order: <strong>{minOrderQuantity} {minOrderQuantity === 1 ? "unit" : "units"}</strong></p>
+          {minOrderQuantity > 1 && <p className="product-minimum-order">Minimum order quantity: <strong>{minOrderQuantity} units</strong></p>}
           {colors.length > 0 && <fieldset className="product-option-group"><legend>Color: {variant?.colorName}</legend><div className="product-color-options">{colors.map((color, index) => <button type="button" key={color._id || index} className={index === colorIndex ? "selected" : ""} aria-label={color.colorName} aria-pressed={index === colorIndex} onClick={() => { setColorIndex(index); setImageIndex(0); setSize(""); setZoomOpen(false); setSelectionError(""); }}><span style={{ backgroundColor: color.colorCode }} />{color.colorName}</button>)}</div></fieldset>}
           <div className="product-option-selectors">
           {sizeOptions.length > 0 && <label className="product-option-group">Size<select id="product-size-select" className={selectionError && sizeRequired ? "needs-selection" : ""} value={size} onChange={(event) => { setSize(event.target.value); setSelectionError(""); }} disabled={!availableSizeOptions.length}><option value="">{availableSizeOptions.length ? "Select size" : "No sizes available"}</option>{sizeOptions.map((item) => {
@@ -288,13 +288,13 @@ const ProductDetailsPage = (props) => {
           {printOptions.length > 0 && <label className="product-option-group">Print side<select id="product-print-select" className={selectionError && !selectedPrintOption ? "needs-selection" : ""} value={printPlacement} onChange={(event) => { setPrintPlacement(event.target.value); setSelectionError(""); }}><option value="">Select print side</option>{printOptions.map((option) => <option key={option.placement} value={option.placement}>{option.placement === "front-and-back" ? "Front and back" : `${option.placement[0].toUpperCase()}${option.placement.slice(1)}`} · Rs. {Number(option.price || 0).toLocaleString("en-PK")}</option>)}</select></label>}
           {customProductOptions.map((group, index) => <label className="product-option-group" key={`${group.name}-${index}`}>{group.name}<select data-custom-option={index} className={selectionError && !customOptionSelections[index] ? "needs-selection" : ""} value={customOptionSelections[index] || ""} onChange={(event) => { setCustomOptionSelections((current) => ({ ...current, [index]: event.target.value })); setSelectionError(""); }}><option value="">Select {group.name.toLowerCase()}</option>{(group.options || []).map((option, choiceIndex) => <option key={`${option.value}-${choiceIndex}`} value={option.value}>{option.value}{option.price !== undefined && option.price !== null && option.price !== "" ? ` · +Rs. ${Number(option.price).toLocaleString("en-PK")}` : ""}</option>)}</select></label>)}
           </div>
-          {selectionError && <p className="product-cart-error" role="alert">{selectionError}</p>}
+          {selectionError && <p className="product-cart-error" role="alert"><strong>Required to add to cart:</strong> {selectionError}</p>}
           {requiresCustomerDesign && <section className="product-custom-design" aria-labelledby="custom-design-title">
             <h2 id="custom-design-title">Add files for your order</h2>
             {product.customDesignGuidelines?.trim() && <><p className={`product-design-guidelines ${product.customDesignGuidelines.length > 260 ? "product-detail-value-preview" : ""}`}>{product.customDesignGuidelines}</p>{product.customDesignGuidelines.length > 260 && <button type="button" className="product-description-read-button" onClick={() => setReadModal({ title: "Additional product information", text: product.customDesignGuidelines })}>Read full text</button>}</>}
             <p>Upload the files needed for this order. JPG, PNG, WebP, or PDF, up to 10 MB.</p>
             {(printPlacement === "front-and-back" ? ["front", "back"] : [printPlacement === "back" ? "back" : "front"]).map((side) => <div className="product-design-side" key={side}>
-              <label className="product-design-upload" htmlFor={`artwork-${side}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); selectDesignFile(side, event.dataTransfer.files?.[0]); }}>Drop a file for {side} here or choose a file <span className="required-label">Required</span><input id={`artwork-${side}`} type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" aria-invalid={Boolean(designError && !designFiles[side])} onChange={(event) => selectDesignFile(side, event.target.files?.[0])} /></label>
+              <label className={`product-design-upload ${designError && !designFiles[side] ? "needs-selection" : ""}`} htmlFor={`artwork-${side}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); selectDesignFile(side, event.dataTransfer.files?.[0]); }}>Drop a file for {side} here or choose a file <span className="required-label">Required</span><input id={`artwork-${side}`} type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" aria-invalid={Boolean(designError && !designFiles[side])} onChange={(event) => selectDesignFile(side, event.target.files?.[0])} /></label>
               {designFiles[side] && <div className="product-design-selected">{designFiles[side].type === "application/pdf" || /\.pdf$/i.test(designFiles[side].name) ? <span className="product-design-pdf" aria-label="PDF artwork">PDF</span> : <img src={designPreviewUrls[side]} alt={`Preview of artwork for ${side}`} />}<span>{designFiles[side].name}</span><button type="button" onClick={() => setDesignFiles((current) => ({ ...current, [side]: null }))}>Remove</button></div>}
             </div>)}
             {allowDesignInstructions && <label className="product-design-instructions">Additional instructions (optional)<textarea maxLength={1000} rows={3} value={designInstructions} onChange={(event) => setDesignInstructions(event.target.value)} placeholder="Share any details needed to fulfill this order" /></label>}
